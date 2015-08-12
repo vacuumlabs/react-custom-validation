@@ -33,5 +33,6 @@ gulp.task('build', ['js', 'html']);
 
 // Main task to run
 gulp.task('watch', ['build'], function () {
-  gulp.watch('./app/**/*', ['js', browserSync.reload ]);
+  gulp.watch(`./${argv.example}/**/*`, ['js']);
+  gulp.watch('./lib/**/*', ['js']);
 });
