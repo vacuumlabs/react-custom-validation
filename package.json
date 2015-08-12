@@ -1,0 +1,25 @@
+{
+  "name": "rebranding-2015",
+  "version": "0.0.1",
+  "dependencies": {
+    "browserify": "^8.1.1",
+    "react": "^0.13.0",
+    "rx": "^3.0.0",
+    "yargs": "^3.18.0"
+  },
+  "devDependencies": {
+    "babel": "^4.3.0",
+    "babelify": "^5.0.3",
+    "bluebird": "^2.9.25",
+    "browser-sync": "^2.0.1",
+    "eslint": "^0.23.0",
+    "eslint-plugin-react": "^2.5.2",
+    "gulp": "^3.8.11",
+    "gulp-nodemon": "^1.0.5",
+    "gulp-uglify": "^1.1.0",
+    "node-jsx": "^0.12.4",
+    "reactify": "^1.0.0",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.0.0"
+  }
+}
