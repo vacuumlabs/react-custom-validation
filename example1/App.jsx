@@ -1,26 +1,29 @@
 'use strict';
 
-var React = require('react');
-var Validate = require('../lib/Validate.jsx');
-var Promise = require('bluebird');
+import React from 'react';
+import {Validate} from '../lib/Validate.jsx';
+import Promise from 'bluebird';
 
-module.exports = React.createClass({
+export class App extends React.Component {
 
-    getInitialState: function() {
-        return {
+    constructor(props) {
+        super(props);
+        this.state = {
             'message': '',
             'showValidation': false,
             'inputValue': ''
         };
-    },
+        this.handleInputChange = this.handleInputChange.bind(this);
+        this.handleValidation = this.handleValidation.bind(this);
+    }
 
-    handleInputChange: function(e) {
+    handleInputChange(e) {
         this.setState({
             'inputValue': e.target.value
         });
-    },
+    }
 
-    handleValidation: function(validity) {
+    handleValidation(validity) {
         let message = '';
         switch (validity.valid) {
             case null:
@@ -37,9 +40,9 @@ module.exports = React.createClass({
             'message': message,
             'showValidation': validity.showValidation
         });
-    },
+    }
 
-    render: function() {
+    render() {
         return (
             <div>
                 <Validate onValidation={this.handleValidation} >
@@ -81,4 +84,4 @@ module.exports = React.createClass({
             </div>
         );
     }
-});
+}

@@ -1,52 +1,21 @@
-'use strict';
+import React from 'react';
+import Promise from 'bluebird';
+import Rx from 'rx';
 
-var Promise = require('bluebird');
-var React = require('react');
-var Rx = require('rx');
+export class Validate extends React.Component {
 
-module.exports = React.createClass({
-
-    rules: [],
-    subjectStream: null,
-    subscription: null,
-
-    buildValidationResponse: function(valid, error, showValidation) {
-        return {
-            'valid': valid,
-            'error': error,
-            'showValidation': showValidation
-        };
-    },
-
-    onInputChange: function(e) {
-        this.props.onValidation(this.buildValidationResponse(null, '', false));
-        this.subjectStream.onNext(e.target.value);
-    },
-
-    hasAnyRules: function() {
-        return 'length' in this.props.children;
-    },
-
-    getInput: function() {
-        if (this.hasAnyRules()) {
-            return this.props.children[0];
-        } else {
-            return this.props.children;
-        }
-    },
-
-    getInputValue: function() {
-        return this.getInput().props.value;
-    },
-
-    componentDidMount: function() {
+    constructor(props) {
+        super(props);
         // Collect rules (functions) & promisify
         // Rule functions should have signature (value, callback)
         if (this.hasAnyRules()) {
             this.rules = this.props.children.slice(1);
             // Init array fields with null
             this.validationResults = Array.apply(null, new Array(this.rules.length)).map((x) => null);
+        } else {
+            this.rules = [];
         }
+        this.onInputChange = this.onInputChange.bind(this);
         this.subjectStream = new Rx.Subject();
         this.subscription = this.subjectStream
             .debounce(500)
@@ -54,11 +23,39 @@ module.exports = React.createClass({
                 (value) => Rx.Observable.fromPromise(this.validate(value)))
             .subscribe(
                 (validationResult) => this.props.onValidation(validationResult));
-    },
+    }
 
-    validate: function(value) {
+    buildValidationResponse(valid, error, showValidation) {
+        return {
+            'valid': valid,
+            'error': error,
+            'showValidation': showValidation
+        };
+    }
+
+    onInputChange(e) {
+        this.props.onValidation(this.buildValidationResponse(null, '', false));
+        this.subjectStream.onNext(e.target.value);
+    }
+
+    hasAnyRules() {
+        return 'length' in this.props.children;
+    }
+
+    getInput() {
+        if (this.hasAnyRules()) {
+            return this.props.children[0];
+        } else {
+            return this.props.children;
+        }
+    }
+
+    getInputValue() {
+        return this.getInput().props.value;
+    }
+
+    validate(value) {
         return new Promise((resolve, reject) => {
-            console.log('validation began');
             // Beginning to validate
             this.props.onValidation(this.buildValidationResponse(null, '', true));
             let valResults = Array.apply(null, new Array(this.rules.length)).map((x) => null);
@@ -90,9 +87,9 @@ module.exports = React.createClass({
                 });
             });
         });
-    },
+    }
 
-    mergeFunctions: function(f1, f2) {
+    mergeFunctions(f1, f2) {
         return (value) => {
             if (f1 != null) {
                 f1(value);
@@ -101,11 +98,9 @@ module.exports = React.createClass({
                 f2(value);
             }
         };
-    },
+    }
 
-    render: function() {
-        console.log(this.getInput());
-        console.log(this.getInput().props);
+    render() {
         return React.cloneElement(
             this.getInput(),
             {
@@ -113,4 +108,4 @@ module.exports = React.createClass({
             },
             this.getInput().props.children);
     }
-});
+}
