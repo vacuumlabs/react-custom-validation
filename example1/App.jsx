@@ -7,27 +7,28 @@ module.exports = React.createClass({
 
     getInitialState: function() {
         return {
-            'message': ''
+            'message': '',
+            'showValidation': false
         };
     },
 
     handleValidation: function(validity) {
+        let message = '';
         switch (validity.valid) {
             case null:
-                this.setState({
-                    'message': 'validating'
-                });
+                message = 'validating';
                 break;
             case true:
-                this.setState({
-                    'message': 'Valid !'
-                });
+                message = 'Valid !';
                 break;
             case false:
-                this.setState({
-                    'message': validity.error
-                });
+                message = validity.error;
+                break;
         }
+        this.setState({
+            'message': message,
+            'showValidation': validity.showValidation
+        });
     },
 
     render: function() {
@@ -51,7 +52,7 @@ module.exports = React.createClass({
                         }
                     }}
                 </Validate>
-                <div>{this.state.message}</div>
+                <div>{this.state.showValidation ? this.state.message : ''}</div>
             </div>
         );
     }
