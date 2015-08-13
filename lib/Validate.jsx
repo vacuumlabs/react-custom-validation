@@ -10,12 +10,6 @@ module.exports = React.createClass({
     subjectStream: null,
     subscription: null,
 
-    getInitialState: function() {
-        return {
-            'value': ''
-        };
-    },
-
     buildValidationResponse: function(valid, error, showValidation) {
         return {
             'valid': valid,
@@ -25,19 +19,24 @@ module.exports = React.createClass({
     },
 
     onInputChange: function(e) {
-        this.setState({
-            'value': e.target.value
-        }, function() {
-            this.subjectStream.onNext(this.state.value);
-        });
+        this.props.onValidation(this.buildValidationResponse(null, '', false));
+        this.subjectStream.onNext(e.target.value);
     },
 
     hasAnyRules: function() {
         return 'length' in this.props.children;
     },
 
+    getInput: function() {
+        if (this.hasAnyRules()) {
+            return this.props.children[0];
+        } else {
+            return this.props.children;
+        }
+    },
+
     getInputValue: function() {
-        return this.state.value;
+        return this.getInput().props.value;
     },
 
     componentDidMount: function() {
@@ -45,16 +44,6 @@ module.exports = React.createClass({
         // Rule functions should have signature (value, callback)
         if (this.hasAnyRules()) {
             this.rules = this.props.children.slice(1);
-            this.rules = this.rules.map((func) => {
-                if (func.length === 1) {
-                    // func has 1 argument => doesnt have callback defined
-                    return Promise.promisify((arg, callback) => {
-                        callback(null, func(arg));
-                    });
-                } else {
-                    return Promise.promisify(func);
-                }
-            });
             // Init array fields with null
             this.validationResults = Array.apply(null, new Array(this.rules.length)).map((x) => null);
         }
@@ -103,16 +92,25 @@ module.exports = React.createClass({
         });
     },
 
-    renderInjectedElement: function(element, propsToInject) {
-        return React.cloneElement(element, propsToInject, element.props.children);
+    mergeFunctions: function(f1, f2) {
+        return (value) => {
+            if (f1 != null) {
+                f1(value);
+            }
+            if (f2 != null) {
+                f2(value);
+            }
+        };
     },
 
     render: function() {
-        return this.renderInjectedElement(
-            this.hasAnyRules() ? this.props.children[0] : this.props.children,
+        console.log(this.getInput());
+        console.log(this.getInput().props);
+        return React.cloneElement(
+            this.getInput(),
             {
-                'onChange': this.onInputChange,
-                'value': this.state.value
-            });
+                'onChange': this.mergeFunctions(this.getInput().props.onChange, this.onInputChange)
+            },
+            this.getInput().props.children);
     }
 });
