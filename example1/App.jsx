@@ -1,58 +1,87 @@
 'use strict';
 
-var React = require('react');
-var Validate = require('../lib/Validate.jsx');
+import React from 'react';
+import {Validate} from '../lib/Validate.jsx';
+import Promise from 'bluebird';
 
-module.exports = React.createClass({
+export class App extends React.Component {
 
-    getInitialState: function() {
-        return {
-            'message': ''
+    constructor(props) {
+        super(props);
+        this.state = {
+            'message': '',
+            'showValidation': false,
+            'inputValue': ''
         };
-    },
+        this.handleInputChange = this.handleInputChange.bind(this);
+        this.handleValidation = this.handleValidation.bind(this);
+    }
 
-    handleValidation: function(validity) {
+    handleInputChange(e) {
+        this.setState({
+            'inputValue': e.target.value
+        });
+    }
+
+    handleValidation(validity) {
+        let message = '';
         switch (validity.valid) {
             case null:
-                this.setState({
-                    'message': 'validating'
-                });
+                message = 'validating';
                 break;
             case true:
-                this.setState({
-                    'message': 'Valid !'
-                });
+                message = 'Valid !';
                 break;
             case false:
-                this.setState({
-                    'message': validity.error
-                });
+                message = validity.error;
+                break;
         }
-    },
+        this.setState({
+            'message': message,
+            'showValidation': validity.showValidation
+        });
+    }
 
-    render: function() {
+    render() {
         return (
             <div>
                 <Validate onValidation={this.handleValidation} >
-                    <input type="text" />
-                    {(value, callback) => {
-                        // This is an async rule, which takes 1s to evaluate
-                        let message = null;
-                        if (value.length < 5) {
-                            message = 'Too short';
-                        } else if (value.length > 10) {
-                            message = 'Too long';
-                        }
-                        setTimeout(function() {callback(null, message); }, 1000);
-                    }}
-                    {(value) => {
-                        if (value.slice(-7) !== 'awesome') {
-                            return 'Your suffix should be awesome !';
-                        }
-                    }}
+                    <input onChange={this.handleInputChange} type="text" value={this.state.inputValue} />
+                    {(value) =>
+                        new Promise((resolve, reject) => {
+                            if (value[0] !== 'a') {
+                                resolve('It should begin with "a"');
+                            } else {
+                                resolve(null);
+                            }
+                        })
+                    }
+                    {(value) =>
+                        new Promise((resolve, reject) => {
+                            // This is an async rule, which takes 1s to evaluate
+                            let message = null;
+                            if (value.length < 5) {
+                                message = 'Too short';
+                            } else if (value.length > 10) {
+                                message = 'Too long';
+                            }
+                            setTimeout(function() {
+                                resolve(message);
+                            }, 1000);
+                        })
+                    }
+                    {(value) =>
+                        new Promise((resolve, reject) => {
+                            if (value.slice(-7) !== 'awesome') {
+                                resolve('Your suffix should be awesome !');
+                            } else {
+                                resolve(null);
+                            }
+                        })
+                    }
                 </Validate>
-                <div>{this.state.message}</div>
+                <div>{this.state.showValidation ? this.state.message : ''}</div>
             </div>
         );
     }
-});
+}

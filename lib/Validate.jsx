@@ -1,118 +1,88 @@
-'use strict';
+import React from 'react';
+import Promise from 'bluebird';
+import Rx from 'rx';
 
-var Promise = require('bluebird');
-var React = require('react');
-var Rx = require('rx');
+export class Validate extends React.Component {
 
-module.exports = React.createClass({
-
-    rules: [],
-    validationResults: [],
-    subjectStream: null,
-    subscription: null,
-
-    getInitialState: function() {
-        return {
-            'value': '',
-            'error': '',
-            'valid': null,
-            'showValidation': false
-        };
-    },
-
-    getDataForValidationHandler: function() {
-        return {
-            'valid': this.state.valid,
-            'error': this.state.error,
-            'showValidation': this.state.showValidation
-        };
-    },
-
-    onInputChange: function(e) {
-        this.setState({
-            'value': e.target.value
-        }, function() {
-            this.subjectStream.onNext(this.state.value);
-        });
-    },
-
-    hasAnyRules: function() {
-        return 'length' in this.props.children;
-    },
-
-    componentDidMount: function() {
+    constructor(props) {
+        super(props);
         // Collect rules (functions) & promisify
         // Rule functions should have signature (value, callback)
         if (this.hasAnyRules()) {
             this.rules = this.props.children.slice(1);
-            this.rules = this.rules.map((func) => {
-                if (func.length === 1) {
-                    // func has 1 argument => doesnt have callback defined
-                    return Promise.promisify((arg, callback) => {
-                        callback(null, func(arg));
-                    });
-                } else {
-                    return Promise.promisify(func);
-                }
-            });
             // Init array fields with null
             this.validationResults = Array.apply(null, new Array(this.rules.length)).map((x) => null);
+        } else {
+            this.rules = [];
         }
+        this.onInputChange = this.onInputChange.bind(this);
         this.subjectStream = new Rx.Subject();
-        this.subscription = this.subjectStream.debounce(500).subscribe(
-            (val) => this.validate()
-        );
-    },
+        this.subscription = this.subjectStream
+            .debounce(500)
+            .flatMapLatest(
+                (value) => Rx.Observable.fromPromise(this.validate(value)))
+            .subscribe(
+                (validationResult) => this.props.onValidation(validationResult));
+    }
 
-    validate: function() {
-        this.setState({
-            'valid': null
-        }, function() {
-            // Validity has changed to null => trigger event
-            this.props.onValidation(this.getDataForValidationHandler());
+    componentWillUnmount() {
+        this.subjectStream.dispose();
+    }
+
+    buildValidationResponse(valid, error, showValidation) {
+        return {
+            'valid': valid,
+            'error': error,
+            'showValidation': showValidation
+        };
+    }
+
+    onInputChange(e) {
+        this.props.onValidation(this.buildValidationResponse(null, '', false));
+        this.subjectStream.onNext(e.target.value);
+    }
+
+    hasAnyRules() {
+        return 'length' in this.props.children;
+    }
+
+    getInput() {
+        if (this.hasAnyRules()) {
+            return this.props.children[0];
+        } else {
+            return this.props.children;
+        }
+    }
+
+    getInputValue() {
+        return this.getInput().props.value;
+    }
+
+    validate(value) {
+        return new Promise((resolve, reject) => {
+            // Beginning to validate
+            this.props.onValidation(this.buildValidationResponse(null, '', true));
+            let valResults = Array.apply(null, new Array(this.rules.length)).map((x) => null);
             this.rules.forEach((rule, ruleIndex) => {
-                // Register the promises and make them cancellable
-                this.validationResults[ruleIndex] = rule(this.state.value).cancellable();
+                valResults[ruleIndex] = rule(value);
             });
-            this.validationResults.forEach((resPromise) => {
+            valResults.forEach((resPromise) => {
                 resPromise.then((result) => {
                     console.log('in Then callback');
                     let index = 0;
-                    while ((index < this.validationResults.length) && (this.validationResults[index].isFulfilled()) && (this.validationResults[index].value() == null)) {
+                    while ((index < valResults.length) && (valResults[index].isFulfilled()) && (valResults[index].value() == null)) {
                         index++;
                     }
-                    let firstRelevant = (index < this.validationResults.length ? this.validationResults[index] : this.validationResults[this.validationResults.length - 1]);
+                    let firstRelevant = (index < valResults.length ? valResults[index] : valResults[valResults.length - 1]);
                     if (firstRelevant.isFulfilled()) {
                         // The promise is completed
                         if (firstRelevant.value() == null) {
                             // successfully (null or undefined)
-                            this.validationResults.map((e) => null);
-                            if (this.state.valid !== true) {
-                                // Validity has changed, trigger event
-                                this.setState({
-                                    'valid': true,
-                                    'error' : '',
-                                    'showValidation': true
-                                }, function() {
-                                    this.props.onValidation(this.getDataForValidationHandler());
-                                });
-                            }
+                            resolve(this.buildValidationResponse(true, '', true));
                         } else {
                             // There is a rule, which was broken, but all rules prior to it
                             // were followed => we found the breaking rule
-                            // We shall cancel all the running promises
-                            this.validationResults.forEach((res) => res.cancel());
-                            this.validationResults.map((e) => null);
-                            if ((this.state.valid !== false) || (this.state.error !== firstRelevant.value())) {
-                                // Validity has changed (different error), trigger event
-                                this.setState({
-                                    'valid': false,
-                                    'error': firstRelevant.value(),
-                                    'showValidation': true
-                                }, function() {
-                                    this.props.onValidation(this.getDataForValidationHandler());
-                                });
-                            }
+                            resolve(this.buildValidationResponse(false, firstRelevant.value(), true));
                         }
                     } else {
                         // We don't know yet, if it's valid or which rule is first failed
@@ -121,18 +91,25 @@ module.exports = React.createClass({
                 });
             });
         });
-    },
-
-    renderInjectedElement: function(element, propsToInject) {
-        return React.cloneElement(element, propsToInject);
-    },
-
-    render: function() {
-        return this.renderInjectedElement(
-            this.hasAnyRules() ? this.props.children[0] : this.props.children,
-            {
-                'onChange': this.onInputChange,
-                'value': this.state.value
-            });
     }
-});
+
+    mergeFunctions(f1, f2) {
+        return (value) => {
+            if (f1 != null) {
+                f1(value);
+            }
+            if (f2 != null) {
+                f2(value);
+            }
+        };
+    }
+
+    render() {
+        return React.cloneElement(
+            this.getInput(),
+            {
+                'onChange': this.mergeFunctions(this.getInput().props.onChange, this.onInputChange)
+            },
+            this.getInput().props.children);
+    }
+}
