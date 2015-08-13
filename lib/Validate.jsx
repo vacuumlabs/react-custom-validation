@@ -25,6 +25,10 @@ export class Validate extends React.Component {
                 (validationResult) => this.props.onValidation(validationResult));
     }
 
+    componentWillUnmount() {
+        this.subjectStream.dispose();
+    }
+
     buildValidationResponse(valid, error, showValidation) {
         return {
             'valid': valid,
