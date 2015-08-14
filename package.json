@@ -1,6 +1,8 @@
 {
-  "name": "rebranding-2015",
-  "version": "0.0.1",
+  "name": "react-custom-validation",
+  "version": "0.0.3",
+  "description": "Form validation with customizable rules",
+  "main": "dist/validation.js",
   "dependencies": {
     "browserify": "^8.1.1",
     "react": "^0.13.0",
@@ -10,20 +12,17 @@
   "devDependencies": {
     "babel": "^5.4.7",
     "babel-core": "^5.8.12",
-    "babel-eslint": "^3.0.1",    
+    "babel-eslint": "^3.0.1",
     "babelify": "^6.1.3",
     "bluebird": "^2.9.25",
-    "browser-sync": "^2.0.1",
     "eslint": "^0.23.0",
     "eslint-plugin-react": "^2.5.2",
     "gulp": "^3.8.11",
     "gulp-babel": "^5.1.0",
     "gulp-nodemon": "^1.0.5",
     "gulp-sourcemaps": "^1.5.2",
-    "gulp-uglify": "^1.1.0",
     "node-jsx": "^0.12.4",
     "reactify": "^1.0.0",
-    "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.0.0"
   }
 }

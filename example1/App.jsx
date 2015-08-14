@@ -1,7 +1,7 @@
 'use strict';
 
 import React from 'react';
-import {Validate} from '../lib/Validate.jsx';
+import {Validate} from '../lib/Validate';
 import Promise from 'bluebird';
 
 export class App extends React.Component {

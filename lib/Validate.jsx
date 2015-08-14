@@ -5,6 +5,10 @@ import Rx from 'rx';
 export function and(rules) {
     return (value) => {
         return new Promise((resolve, reject) => {
+            if (rules.length === 0) {
+                // Trivial case, there are no rules
+                resolve(null);
+            }
             // Beginning to validate
             const valResults = rules.map((rule) => rule(value));
             valResults.forEach((resPromise) => {
@@ -29,6 +33,10 @@ export function and(rules) {
 
 
 export class Validate extends React.Component {
+
+    static defaultProps = {
+        onValidation: (v) => {}
+    }
 
     constructor(props) {
         super(props);
