@@ -2,23 +2,43 @@ import React from 'react';
 import Promise from 'bluebird';
 import Rx from 'rx';
 
+export function and(rules) {
+    return (value) => {
+        return new Promise((resolve, reject) => {
+            // Beginning to validate
+            const valResults = rules.map((rule) => rule(value));
+            valResults.forEach((resPromise) => {
+                resPromise.then((result) => {
+                    let index = 0;
+                    while ((index < valResults.length) && (valResults[index].isFulfilled()) && (valResults[index].value() == null)) {
+                        index++;
+                    }
+                    let firstRelevant = (index < valResults.length ? valResults[index] : valResults[valResults.length - 1]);
+                    if (firstRelevant.isFulfilled()) {
+                        // The promise is completed
+                        resolve(firstRelevant.value());
+                    } else { // eslint-disable-line 
+                        // We don't know yet, if it's valid or which rule is first failed
+                        // so just continue waiting
+                    }
+                });
+            });
+        });
+    };
+}
+
+
 export class Validate extends React.Component {
 
     constructor(props) {
         super(props);
         // Collect rules (functions) & promisify
         // Rule functions should have signature (value, callback)
-        if (this.hasAnyRules()) {
-            this.rules = this.props.children.slice(1);
-            // Init array fields with null
-            this.validationResults = Array.apply(null, new Array(this.rules.length)).map((x) => null);
-        } else {
-            this.rules = [];
-        }
-        this.onInputChange = this.onInputChange.bind(this);
+        this.rules = this.children.slice(1);
         this.subjectStream = new Rx.Subject();
         this.subscription = this.subjectStream
             .debounce(500)
+            .startWith(this.input.props.value)
             .flatMapLatest(
                 (value) => Rx.Observable.fromPromise(this.validate(value)))
             .subscribe(
@@ -37,79 +57,47 @@ export class Validate extends React.Component {
         };
     }
 
-    onInputChange(e) {
-        this.props.onValidation(this.buildValidationResponse(null, '', false));
+    onInputChange = (e) => {
+        // Input has changed -> fire event, should not show validation
+        this.props.onValidation(this.buildValidationResponse(null, null, false));
         this.subjectStream.onNext(e.target.value);
     }
 
-    hasAnyRules() {
-        return 'length' in this.props.children;
+    get children() {
+        const c = this.props.children;
+        return c instanceof Array ? c : [c];
     }
 
-    getInput() {
-        if (this.hasAnyRules()) {
-            return this.props.children[0];
-        } else {
-            return this.props.children;
-        }
-    }
-
-    getInputValue() {
-        return this.getInput().props.value;
+    get input() {
+        return this.children[0];
     }
 
     validate(value) {
-        return new Promise((resolve, reject) => {
-            // Beginning to validate
-            this.props.onValidation(this.buildValidationResponse(null, '', true));
-            let valResults = Array.apply(null, new Array(this.rules.length)).map((x) => null);
-            this.rules.forEach((rule, ruleIndex) => {
-                valResults[ruleIndex] = rule(value);
-            });
-            valResults.forEach((resPromise) => {
-                resPromise.then((result) => {
-                    console.log('in Then callback');
-                    let index = 0;
-                    while ((index < valResults.length) && (valResults[index].isFulfilled()) && (valResults[index].value() == null)) {
-                        index++;
-                    }
-                    let firstRelevant = (index < valResults.length ? valResults[index] : valResults[valResults.length - 1]);
-                    if (firstRelevant.isFulfilled()) {
-                        // The promise is completed
-                        if (firstRelevant.value() == null) {
-                            // successfully (null or undefined)
-                            resolve(this.buildValidationResponse(true, '', true));
-                        } else {
-                            // There is a rule, which was broken, but all rules prior to it
-                            // were followed => we found the breaking rule
-                            resolve(this.buildValidationResponse(false, firstRelevant.value(), true));
-                        }
-                    } else {
-                        // We don't know yet, if it's valid or which rule is first failed
-                        // so just continue waiting
-                    }
-                });
-            });
+        this.props.onValidation(this.buildValidationResponse(null, null, true));
+        return and(this.rules)(value).then((result) => {
+            if (result == null) {
+                // successfully (null or undefined)
+                return this.buildValidationResponse(true, null, true);
+            } else {
+                // There is a rule, which was broken, but all rules prior to it
+                // were followed => we found the breaking rule
+                return this.buildValidationResponse(false, result, true);
+            }
         });
     }
 
-    mergeFunctions(f1, f2) {
-        return (value) => {
-            if (f1 != null) {
-                f1(value);
-            }
-            if (f2 != null) {
-                f2(value);
-            }
-        };
+    mergeFunctions(...fns) {
+        return (value) => fns
+            .filter((f) => f != null)
+            .forEach((f)=> f(value));
     }
 
     render() {
         return React.cloneElement(
-            this.getInput(),
+            this.input,
             {
-                'onChange': this.mergeFunctions(this.getInput().props.onChange, this.onInputChange)
+                'onChange': this.mergeFunctions(this.input.props.onChange, this.onInputChange)
             },
-            this.getInput().props.children);
+            this.input.props.children);
     }
 }
