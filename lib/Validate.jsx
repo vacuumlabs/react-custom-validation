@@ -2,6 +2,11 @@ import React from 'react';
 import Promise from 'bluebird';
 import Rx from 'rx';
 
+function validationSuccessful(result) {
+    // Successful if result is (undefined, null or true)
+    return ((result == null) || (result === true));
+}
+
 export function and(rules) {
     return (value) => {
         return new Promise((resolve, reject) => {
@@ -14,7 +19,7 @@ export function and(rules) {
             valResults.forEach((resPromise) => {
                 resPromise.then((result) => {
                     let index = 0;
-                    while ((index < valResults.length) && (valResults[index].isFulfilled()) && (valResults[index].value() == null)) {
+                    while ((index < valResults.length) && (valResults[index].isFulfilled()) && validationSuccessful(valResults[index].value())) {
                         index++;
                     }
                     let firstRelevant = (index < valResults.length ? valResults[index] : valResults[valResults.length - 1]);
@@ -44,6 +49,10 @@ export class Validate extends React.Component {
         // Rule functions should have signature (value, callback)
         this.rules = this.children.slice(1);
         this.subjectStream = new Rx.Subject();
+        this.isInitialValidation = true;
+    }
+
+    componentDidMount() {
         this.subscription = this.subjectStream
             .debounce(500)
             .startWith(this.input.props.value)
@@ -81,15 +90,20 @@ export class Validate extends React.Component {
     }
 
     validate(value) {
-        this.props.onValidation(this.buildValidationResponse(null, null, true));
+        let shouldShowValidation = true;
+        if (this.isInitialValidation) {
+            shouldShowValidation = false;
+            this.isInitialValidation = false;
+        }
+        this.props.onValidation(this.buildValidationResponse(null, null, shouldShowValidation));
         return and(this.rules)(value).then((result) => {
-            if (result == null) {
-                // successfully (null or undefined)
-                return this.buildValidationResponse(true, null, true);
+            if (validationSuccessful(result)) {
+                // successfully (null, undefined, true)
+                return this.buildValidationResponse(true, null, shouldShowValidation);
             } else {
                 // There is a rule, which was broken, but all rules prior to it
                 // were followed => we found the breaking rule
-                return this.buildValidationResponse(false, result, true);
+                return this.buildValidationResponse(false, result, shouldShowValidation);
             }
         });
     }

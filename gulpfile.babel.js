@@ -23,7 +23,7 @@ gulp.task('js', function() {
 });
 
 gulp.task('build-dist', function() {
-    return gulp.src('lib/**/*.js')
+    return gulp.src('lib/**/*.jsx')
         .pipe(babel({
             stage: 0
         }))
