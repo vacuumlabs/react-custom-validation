@@ -1,29 +1,31 @@
 'use strict';
 
 import React from 'react';
-import {Validate} from '../lib/Validate';
-import Promise from 'bluebird';
+import {Validate, IsEmail, IsRequired, HasNumber, HasLength} from '../lib/validation';
 
 export class App extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            'message': '',
-            'showValidation': false,
-            'inputValue': ''
+        let createState = (...fields) => {
+            let state = {};
+            fields.forEach((f) => {
+                state[f + '_message'] = '';
+                state[f + '_showValidation'] = false;
+                state[f + '_value'] = '';
+            });
+            return state;
         };
-        this.handleInputChange = this.handleInputChange.bind(this);
-        this.handleValidation = this.handleValidation.bind(this);
+        this.state = createState('email', 'password');
     }
 
-    handleInputChange(e) {
+    handleChange = (inputName) => (e) => {
         this.setState({
-            'inputValue': e.target.value
+            [inputName + '_value']: e.target.value
         });
     }
 
-    handleValidation(validity) {
+    handleValidation = (inputName) => (validity) => {
         let message = '';
         switch (validity.valid) {
             case null:
@@ -37,50 +39,33 @@ export class App extends React.Component {
                 break;
         }
         this.setState({
-            'message': message,
-            'showValidation': validity.showValidation
+            [inputName + '_message']: message,
+            [inputName + '_showValidation']: validity.showValidation
         });
+    }
+
+    renderMessage(inputName) {
+        return this.state[inputName + '_showValidation'] ? this.state[inputName + '_message'] : null;
     }
 
     render() {
         return (
             <div>
-                <Validate onValidation={this.handleValidation} >
-                    <input onChange={this.handleInputChange} type="text" value={this.state.inputValue} />
-                    {(value) =>
-                        new Promise((resolve, reject) => {
-                            if (value[0] !== 'a') {
-                                resolve('It should begin with "a"');
-                            } else {
-                                resolve(null);
-                            }
-                        })
-                    }
-                    {(value) =>
-                        new Promise((resolve, reject) => {
-                            // This is an async rule, which takes 1s to evaluate
-                            let message = null;
-                            if (value.length < 5) {
-                                message = 'Too short';
-                            } else if (value.length > 10) {
-                                message = 'Too long';
-                            }
-                            setTimeout(function() {
-                                resolve(message);
-                            }, 1000);
-                        })
-                    }
-                    {(value) =>
-                        new Promise((resolve, reject) => {
-                            if (value.slice(-7) !== 'awesome') {
-                                resolve('Your suffix should be awesome !');
-                            } else {
-                                resolve(null);
-                            }
-                        })
-                    }
+                <label htmlFor="email">Email: </label>
+                <Validate onValidation={this.handleValidation('email')} >
+                    <input id="email" onChange={this.handleChange('email')} type="text" value={this.state.email_value} />
+                    <IsRequired />
+                    <IsEmail msg="The E-mail you entered is invalid" />
                 </Validate>
-                <div>{this.state.showValidation ? this.state.message : ''}</div>
+                <div>{this.renderMessage('email')}</div>
+                <label htmlFor="password">Password: </label>
+                <Validate onValidation={this.handleValidation('password')} >
+                    <input id="password" onChange={this.handleChange('password')} type="text" value={this.state.password_value} />
+                    <IsRequired />
+                    <HasLength min={6} max={10} />
+                    <HasNumber />
+                </Validate>
+                <div>{this.renderMessage('password')}</div>
             </div>
         );
     }

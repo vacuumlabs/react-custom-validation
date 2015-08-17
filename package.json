@@ -1,6 +1,6 @@
 {
   "name": "react-custom-validation",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "description": "Form validation with customizable rules",
   "main": "dist/validation.js",
   "dependencies": {
@@ -8,6 +8,7 @@
     "browserify": "^8.1.1",
     "react": "^0.13.0",
     "rx": "^3.0.0",
+    "validator": "^4.0.3",
     "yargs": "^3.18.0"
   },
   "devDependencies": {

@@ -2,7 +2,7 @@ import React from 'react';
 import Promise from 'bluebird';
 import Rx from 'rx';
 
-function validationSuccessful(result) {
+export function validationSuccessful(result) {
     // Successful if result is (undefined, null or true)
     return ((result == null) || (result === true));
 }
@@ -47,7 +47,7 @@ export class Validate extends React.Component {
         super(props);
         // Collect rules (functions) & promisify
         // Rule functions should have signature (value, callback)
-        this.rules = this.children.slice(1);
+        this.rules = this.children.slice(1).map((elem) => (value) => elem.type(value, elem.props));
         this.subjectStream = new Rx.Subject();
         this.isInitialValidation = true;
     }
