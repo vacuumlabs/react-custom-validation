@@ -52,15 +52,15 @@ export class App extends React.Component {
         return (
             <div>
                 <label htmlFor="email">Email: </label>
-                <Validate onValidation={this.handleValidation('email')} >
-                    <input id="email" onChange={this.handleChange('email')} type="text" value={this.state.email_value} />
+                <Validate onChange={this.handleChange('email')} onValidation={this.handleValidation('email')} value={this.state.email_value} >
+                    <input id="email" type="text" />
                     <IsRequired />
                     <IsEmail msg="The E-mail you entered is invalid" />
                 </Validate>
                 <div>{this.renderMessage('email')}</div>
                 <label htmlFor="password">Password: </label>
-                <Validate onValidation={this.handleValidation('password')} >
-                    <input id="password" onChange={this.handleChange('password')} type="text" value={this.state.password_value} />
+                <Validate onChange={this.handleChange('password')} onValidation={this.handleValidation('password')} value={this.state.password_value} >
+                    <input id="password" type="text" />
                     <IsRequired />
                     <HasLength min={6} max={10} />
                     <HasNumber />
