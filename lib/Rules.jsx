@@ -6,11 +6,11 @@ export function IsEmail(value, {msg}) {
 }
 
 export function IsRequired(value, {msg}) {
-    return Promise.resolve(value.length > 0 || msg || 'This field is required.');
+    return Promise.resolve((value != null && value.length > 0) || msg || 'This field is required.');
 }
 
 export function HasNumber(value, {msg}) {
-    return Promise.resolve(value.match(/.*[0-9]+.*/i) === null ?
+    return Promise.resolve((value == null || value.match(/.*[0-9]+.*/i) === null) ?
             (msg || 'This field should contain at least one number.')
         :
             true);
