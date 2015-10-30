@@ -1,6 +1,6 @@
-import React from 'react';
-import {App} from './App';
+import React from 'react'
+import {App} from './App'
 
 document.addEventListener('DOMContentLoaded', function(event) {
-    React.render(<App />, document.getElementById('main'));
-});
+  React.render(<App />, document.getElementById('main'))
+})
