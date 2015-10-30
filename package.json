@@ -6,7 +6,8 @@
   "dependencies": {
     "bluebird": "^2.9.25",
     "browserify": "^8.1.1",
-    "react": "^0.13.0",
+    "immutable": "^3.7.5",
+    "react": "^0.14.1",
     "rx": "^3.0.0",
     "validator": "^4.0.3",
     "yargs": "^3.18.0"
