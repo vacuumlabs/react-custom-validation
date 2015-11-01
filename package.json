@@ -8,6 +8,7 @@
     "browserify": "^8.1.1",
     "immutable": "^3.7.5",
     "react": "^0.14.1",
+    "react-dom": "^0.14.1",
     "rx": "^3.0.0",
     "validator": "^4.0.3",
     "yargs": "^3.18.0"

@@ -27,7 +27,7 @@ export class App extends React.Component {
   constructor(props) {
     super(props)
     let state = {}
-    for (let field of ['email', 'password']) {
+    for (let field of ['email', 'password', 'rePassword']) {
       state[field] = {value: '', message: '', showValidation: false}
     }
     this.state = state
@@ -66,7 +66,10 @@ export class App extends React.Component {
   }
 
   render() {
-    let {email: {value: email}, password: {value: password}} = this.state
+    let {
+      email: {value: email},
+      password: {value: password},
+      rePassword: {value: rePassword}} = this.state
 
     return (
       <div>
@@ -88,6 +91,7 @@ export class App extends React.Component {
         <input
           id="password"
           onChange={this.handleChange('password')}
+          onBlur={this.showValidation('password')}
           type="text"
           value={password} />
         <div>{this.renderMessage('password')}</div>
@@ -96,15 +100,23 @@ export class App extends React.Component {
           args={{value: password}}
         >
           <IsRequired key='is-required' />
-          <HasLength min={6} max={10} />
-          <HasNumber />
+          <HasLength key='has-length' min={6} max={10} />
+          <HasNumber key='has-number' />
         </Validate>
 
-        <Validate onValidation={this.handleValidation('slowValidation')} >
-          {[1000, 2000, 3000].map((time) =>
-            <IsUsed key={`is-used-${time}`} value='something' />)}
+        <label htmlFor="re-password">Repeat password: </label>
+        <input
+          id="re-password"
+          onChange={this.handleChange('rePassword')}
+          onBlur={this.showValidation('rePassword')}
+          type="text"
+          value={rePassword} />
+        <div>{this.renderMessage('rePassword')}</div>
+        <Validate
+          onValidation={this.handleValidation('rePassword')}
+          needTouch={[['are-same', 'value1'], ['are-same', 'value2']]} >
+          <AreSame key='are-same' value1={password} value2={rePassword} />
         </Validate>
-
       </div>
     )
   }
