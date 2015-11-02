@@ -12,74 +12,68 @@ export class App extends React.Component {
 
   constructor(props) {
     super(props)
-    let createState = (...fields) => {
-      let state = {}
-      fields.forEach((f) => {
-        state[f + '_message'] = ''
-        state[f + '_showValidation'] = false
-        state[f + '_value'] = ''
-      })
-      return state
+    let state = {}
+    for (let field of ['email', 'password']) {
+      state[field] = {value: '', message: '', showValidation: false}
     }
-    this.state = createState('email', 'password')
+    this.state = state
   }
 
-  handleChange = (inputName) => (e) => {
-    this.setState({
-      [inputName + '_value']: e.target.value
-    })
+  setFieldState(field, newState) {
+    this.setState({[field]: {...this.state[field], ...newState}})
   }
 
-  handleValidation = (inputName) => (validity) => {
-    let message = ''
-    switch (validity.valid) {
-    case null:
-      message = 'validating'
-      break
-    case true:
-      message = 'Valid !'
-      break
-    case false:
-      message = validity.error
-      break
-    }
-    this.setState({
-      [inputName + '_message']: message,
-      [inputName + '_showValidation']: validity.showValidation
-    })
+  handleChange = (field) => (e) => {
+    this.setFieldState(field, {value: e.target.value})
   }
 
-  renderMessage(inputName) {
-    return this.state[inputName + '_showValidation'] ?
-      this.state[inputName + '_message'] : null
+  handleValidation = (field) => (validity) => {
+    let {valid, error, rule, showValidation} = validity
+    let message
+    if (valid === null) message = 'Validating...'
+    if (valid === true) message = 'Valid!'
+    if (valid === false) message = `Invalid (rule: ${rule}, error: ${error})`
+
+    this.setFieldState(field, {message, showValidation})
+  }
+
+  renderMessage(field) {
+    let {showValidation, message} = this.state[field]
+    return showValidation ? message : null
   }
 
   render() {
+    let {email: {value: email}, password: {value: password}} = this.state
+
     return (
       <div>
         <label htmlFor="email">Email: </label>
-        <Validate onValidation={this.handleValidation('email')} >
-          <input
-            id="email"
-            onChange={this.handleChange('email')}
-            type="text"
-            value={this.state.email_value} />
-          <IsRequired />
-          <IsEmail msg="The E-mail you entered is invalid" />
-        </Validate>
+        <input
+          id="email"
+          onChange={this.handleChange('email')}
+          type="text"
+          value={email} />
         <div>{this.renderMessage('email')}</div>
+        <Validate onValidation={this.handleValidation('email')} >
+          <IsRequired key="is-required" value={email} />
+          <IsEmail key="is-email" value={email} />
+        </Validate>
+
         <label htmlFor="password">Password: </label>
-        <Validate onValidation={this.handleValidation('password')} >
-          <input
-            id="password"
-            onChange={this.handleChange('password')}
-            type="text"
-            value={this.state.password_value} />
-          <IsRequired />
+        <input
+          id="password"
+          onChange={this.handleChange('password')}
+          type="text"
+          value={password} />
+        <div>{this.renderMessage('password')}</div>
+        <Validate
+          onValidation={this.handleValidation('password')}
+          args={{value: password}}
+        >
+          <IsRequired key='is-required' />
           <HasLength min={6} max={10} />
           <HasNumber />
         </Validate>
-        <div>{this.renderMessage('password')}</div>
       </div>
     )
   }

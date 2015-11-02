@@ -1,31 +1,38 @@
-import Promise from 'bluebird'
+//import Promise from 'bluebird'
 import validator from 'validator'
 
-export function IsEmail(value, {msg}) {
-  return Promise.resolve(
-    validator.isEmail(value) ||
-    msg ||
-    'Please enter a valid email.')
+function valid() {
+  return {valid: true, reason: null}
 }
 
-export function IsRequired(value, {msg}) {
-  return Promise.resolve(
-    (value != null && value.length > 0) ||
-    msg ||
-    'This field is required.')
+function invalid(reason) {
+  return {valid: false, reason}
 }
 
-export function HasNumber(value, {msg}) {
-  let isValid = value == null || value.match(/.*[0-9]+.*/i) === null
-  msg = msg || 'This field should contain at least one number.'
-  return Promise.resolve(isValid ? msg : true)
+export function IsEmail({value}) {
+  return (validator.isEmail(value)) ?
+    valid() : invalid('Please enter a valid email.')
 }
 
-export function HasLength(value, {msg, min, max}) {
-  let isValid = !value || (((min == null) ||
-    (value.length >= min)) && ((max == null) || (value.length <= max)))
-  return Promise.resolve(
-    isValid ||
-    msg ||
-    `Length should be between ${min} and ${max}`)
+export function IsRequired({value}) {
+  return (value != null && value.length > 0) ?
+    valid() : invalid('This field is required')
+}
+
+export function HasNumber({value}) {
+  return (value != null && value.match(/.*[0-9]+.*/i) != null) ?
+    valid() : invalid('This field should contain at least one number.')
+}
+
+export function HasLength({value, min, max}) {
+  if (value == null) {
+    return invalid('Value cannot be null.')
+  }
+  if (min != null && value.length < min) {
+    return invalid(`Length should be at least ${min}.`)
+  }
+  if (max != null && value.length > max) {
+    return invalid(`Length should be at most ${max}.`)
+  }
+  return valid()
 }

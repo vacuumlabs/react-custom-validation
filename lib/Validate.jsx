@@ -2,64 +2,74 @@ import React from 'react'
 import Promise from 'bluebird'
 import Rx from 'rx'
 
-export function validationSuccessful(result) {
-  // Successful if result is (undefined, null or true)
-  return ((result == null) || (result === true))
-}
-
 export function and(rules) {
-  return (value) => {
-    return new Promise((resolve, reject) => {
-      if (rules.length === 0) {
-        // Trivial case, there are no rules
-        resolve(null)
-      }
-      // Beginning to validate
-      const valResults = rules.map((rule) => rule(value))
-      valResults.forEach((resPromise) => {
-        resPromise.then((result) => {
-          let index = 0
-          while ((index < valResults.length) &&
-                 (valResults[index].isFulfilled()) &&
-                 validationSuccessful(valResults[index].value())) {
-            index++
-          }
-          let firstRelevant = (index < valResults.length ?
-            valResults[index] : valResults[valResults.length - 1])
-          if (firstRelevant.isFulfilled()) {
-            // The promise is completed
-            resolve(firstRelevant.value())
-          } else { // eslint-disable-line 
-            // We don't know yet, if it's valid or which rule is first failed
-            // so just continue waiting
-          }
-        })
-      })
+  let n = rules.length
+
+  return new Promise((resolve, reject) => {
+    let results = rules.map((r) => {
+      return {name: r.name, result: Promise.resolve(r.fn(r.args))}
     })
-  }
+
+    function findFirstInvalid() {
+      for (let i = 0; i < n; i++) {
+        let {name, result} = results[i]
+        if (!result.isFulfilled()) return
+        let {valid, reason} = result.value()
+        if (!valid) resolve({valid: false, error: reason, rule: name})
+      }
+    }
+
+    return Promise.all(
+      results.map((r) => r.result.then((_) => findFirstInvalid()))
+    ).then((_) => {
+      resolve({valid: true, error: null, rule: null})
+    })
+  })
 }
 
+function rules(children, args) {
+  children = children == null ?
+    [] :
+    children instanceof Array ? children : [children]
+  return children.map((c) => {
+    return {fn: c.type, args: {...args, ...c.props}, name: c.key}
+  })
+}
+
+function areSame(rule1, rule2) {
+  if (rule1.fn !== rule2.fn) return false
+  if (JSON.stringify(rule1.args) !== JSON.stringify(rule2.args)) return false
+  if (rule1.name !== rule2.name) return false
+  return true
+}
+
+function areSameAll(rules1, rules2) {
+  if (rules1.length !== rules2.length) return false
+  for (let i = 0; i < rules1.length; i++) {
+    if (!areSame(rules1[i], rules2[i])) return false
+  }
+  return true
+}
 
 export class Validate extends React.Component {
 
   static defaultProps = {
-    onValidation: (v) => {}
+    args: {},
+    children: [],
   }
 
-  constructor(props) {
-    super(props)
-    // Collect rules (functions) & promisify
-    // Rule functions should have signature (value, callback)
-    this.rules = this.children.slice(1).map(
-      (elem) => (value) => elem.type(value, elem.props))
-    this.subjectStream = new Rx.Subject()
-    this.isInitialValidation = true
+  static propTypes = {
+    args: React.PropTypes.any,
+    children: React.PropTypes.any,
+    onValidation: React.PropTypes.func.isRequired,
   }
 
   componentDidMount() {
+    this.showValidation = false
+    this.subjectStream = new Rx.Subject()
     this.subscription = this.subjectStream
       .debounce(500)
-      .startWith(this.input.props.value)
+      .startWith(this.props)
       .flatMapLatest(
         (value) => Rx.Observable.fromPromise(this.validate(value)))
       .subscribe(
@@ -70,62 +80,27 @@ export class Validate extends React.Component {
     this.subjectStream.dispose()
   }
 
-  buildValidationResponse(valid, error, showValidation) {
-    return {
-      'valid': valid,
-      'error': error,
-      'showValidation': showValidation
+  componentWillReceiveProps(nextProps) {
+    // TODO no rules result in showValidation stuck at false
+    let same = areSameAll(
+      rules(this.props.children, this.props.args),
+      rules(nextProps.children, nextProps.args))
+    if (!same) {
+      this.showValidation = true
+      this.props.onValidation({valid: null, error: null, showValidation: false})
+      this.subjectStream.onNext(nextProps)
     }
   }
 
-  onInputChange = (e) => {
-    // Input has changed -> fire event, should not show validation
-    this.props.onValidation(this.buildValidationResponse(null, null, false))
-    this.subjectStream.onNext(e.target.value)
-  }
-
-  get children() {
-    const c = this.props.children
-    return c instanceof Array ? c : [c]
-  }
-
-  get input() {
-    return this.children[0]
-  }
-
-  validate(value) {
-    let shouldShowValidation = true
-    if (this.isInitialValidation) {
-      shouldShowValidation = false
-      this.isInitialValidation = false
-    }
+  validate() {
     this.props.onValidation(
-      this.buildValidationResponse(null, null, shouldShowValidation))
-    return and(this.rules)(value).then((result) => {
-      if (validationSuccessful(result)) {
-        // successfully (null, undefined, true)
-        return this.buildValidationResponse(true, null, shouldShowValidation)
-      } else {
-        // There is a rule, which was broken, but all rules prior to it
-        // were followed => we found the breaking rule
-        return this.buildValidationResponse(false, result, shouldShowValidation)
-      }
+      {valid: null, error: null, showValidation: this.showValidation})
+    return and(rules(this.props.children, this.props.args)).then((result) => {
+      return {...result, showValidation: this.showValidation}
     })
   }
 
-  mergeFunctions(...fns) {
-    return (value) => fns
-      .filter((f) => f != null)
-      .forEach((f)=> f(value))
-  }
-
   render() {
-    return React.cloneElement(
-      this.input,
-      {
-        'onChange': this.mergeFunctions(
-          this.input.props.onChange, this.onInputChange)
-      },
-      this.input.props.children)
+    return null
   }
 }
