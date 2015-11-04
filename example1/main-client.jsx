@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {App} from './App'
-import {Input, Row, Col, Panel} from 'react-bootstrap'
+import {Input, Grid, Row, Col, Panel} from 'react-bootstrap'
 
 
 class Managed extends React.Component {
@@ -19,16 +19,18 @@ class Managed extends React.Component {
   render() {
     return (<div>
       <Panel collapsible header={"Settings"}>
-        <Row>
-          <Col md={4}>
-            <Input type="text" label="checkTime"
-              onChange={::this.handleCheckTimeChange} value={this.state.checkTime} />
-          </Col>
-          <Col md={4}>
-            <Input type="text" label="typingPace"
-              onChange={::this.handleTypingPace} value={this.state.typingPace} />
-          </Col>
-        </Row>
+        <Grid>
+          <Row>
+            <Col md={4}>
+              <Input type="text" label="typingPace"
+                onChange={::this.handleTypingPace} value={this.state.typingPace} />
+            </Col>
+            <Col md={4}>
+              <Input type="text" label="checkTime"
+                onChange={::this.handleCheckTimeChange} value={this.state.checkTime} />
+            </Col>
+          </Row>
+        </Grid>
       </Panel>
       <App key={JSON.stringify(this.state)}
         checkTime={parseInt(this.state.checkTime, 10) || 500}
