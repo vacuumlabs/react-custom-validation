@@ -9,7 +9,7 @@ import {
   HasNumber,
   HasLength,
   AreSame} from '../lib/validation'
-import {Input, Grid, Row, Col, Panel, Button} from 'react-bootstrap'
+import {Input, Image, Grid, Row, Col, Panel, Button} from 'react-bootstrap'
 
 
 function IsUnique({value, time}) {
@@ -50,7 +50,7 @@ export class App extends React.Component {
 
     if (validationResult != null) {
       valid = validationResult.valid
-      if (valid == null) message = 'Validating...'
+      if (valid == null) message = <Image src="./spinning-wheel.gif" width={30} />
       if (valid === true) message = 'Valid!'
       if (valid === false) message = `Invalid: ${validationResult.error}`
     }
