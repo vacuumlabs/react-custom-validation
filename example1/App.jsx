@@ -101,7 +101,6 @@ export class App extends React.Component {
                 onChange={handleChange}
                 onBlur={this.showValidation(name)}
                 bsStyle={style}
-                hasFeedback
                 value={value} />
         </Col>
         <Col md={8}>
