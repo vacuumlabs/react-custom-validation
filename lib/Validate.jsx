@@ -18,7 +18,7 @@ function and(rules) {
       } else {
         let {valid, reason} = result
         if (!valid) {
-          resolve({valid: false, error: reason, name})
+          resolve({valid: false, error: reason, rule: name})
           return
         }
       }
