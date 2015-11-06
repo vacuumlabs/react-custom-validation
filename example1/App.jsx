@@ -7,7 +7,8 @@ import {
   IsEmail,
   IsRequired,
   HasNumber,
-  HasLength} from '../lib/validation'
+  HasLength,
+  AreSame} from '../lib/validation'
 import {Input, Grid, Row, Col, Panel, Button} from 'react-bootstrap'
 import {valid, invalid} from '../lib/Rules'
 
@@ -16,11 +17,6 @@ function IsUnique({value, time}) {
   let isValid = value.indexOf('used') === -1
   let response = isValid ? valid() : invalid('The value is not unique.')
   return Promise.delay(time).then(() => response)
-}
-
-function AreSame({value1, value2}) {
-  return value1 === value2 ?
-    valid() : invalid('Values have to match.')
 }
 
 export class App extends React.Component {
