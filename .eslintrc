@@ -114,7 +114,7 @@
     // Not ready yet. "react/sort-comp": 1,
     "react/wrap-multilines": 1,
     "react/jsx-boolean-value": 0,
-    "max-len": [1, 80, 2]
+    "max-len": [1, 100, 2]
   },
   "plugins": [
     "react"
