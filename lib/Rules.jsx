@@ -1,4 +1,3 @@
-//import Promise from 'bluebird'
 import validator from 'validator'
 
 export function valid() {
@@ -14,30 +13,30 @@ export function IsEmail({value}) {
     valid() : invalid('Please enter a valid email.')
 }
 
-export function IsRequired({value}) {
+export function IsRequired({value, msg}) {
   return (value != null && value.length > 0) ?
-    valid() : invalid('This field is required')
+    valid() : invalid(msg || 'This field is required')
 }
 
-export function HasNumber({value}) {
+export function HasNumber({value, msg}) {
   return (value != null && value.match(/.*[0-9]+.*/i) != null) ?
-    valid() : invalid('This field should contain at least one digit.')
+    valid() : invalid(msg || 'This field should contain at least one digit.')
 }
 
-export function HasLength({value, min, max}) {
+export function HasLength({value, min, max, msg, msgNull, msgShort, msgLong}) {
   if (value == null) {
-    return invalid('Value cannot be null.')
+    return invalid(msgNull || msg || 'Value cannot be null.')
   }
   if (min != null && value.length < min) {
-    return invalid(`Length should be at least ${min}.`)
+    return invalid(msgShort || msg || `Length should be at least ${min}.`)
   }
   if (max != null && value.length > max) {
-    return invalid(`Length should be at most ${max}.`)
+    return invalid(msgLong || msg || `Length should be at most ${max}.`)
   }
   return valid()
 }
 
-export function AreSame({value1, value2}) {
+export function AreSame({value1, value2, msg}) {
   return value1 === value2 ?
-    valid() : invalid('Values have to match.')
+    valid() : invalid(msg || 'Values have to match.')
 }
