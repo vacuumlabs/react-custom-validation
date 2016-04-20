@@ -30,7 +30,7 @@ gulp.task('build-dist', function() {
 })
 
 gulp.task('html', function() {
-  return gulp.src('./html/index.html')
+  return gulp.src('./html/**/*')
     .pipe(gulp.dest(BUILD_FOLDER))
 })
 

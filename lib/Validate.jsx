@@ -110,6 +110,7 @@ export class Validate extends React.Component {
   static defaultProps = {
     args: {},
     children: [],
+    maxTypingPace: 500,
   }
 
   static propTypes = {
@@ -117,6 +118,7 @@ export class Validate extends React.Component {
     children: React.PropTypes.any,
     needTouch: React.PropTypes.array,
     onValidation: React.PropTypes.func.isRequired,
+    maxTypingPace: React.PropTypes.number,
   }
 
   componentDidMount() {
@@ -131,7 +133,7 @@ export class Validate extends React.Component {
       })
 
     this.subjectStream
-      .debounce(500)
+      .debounce(this.props.maxTypingPace)
       .subscribe((rules) => {
         this.props.onValidation({showValidation:
           allTouched(rules, fromJS(this.props.needTouch), this.touched)})
