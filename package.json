@@ -11,6 +11,7 @@
   "dependencies": {
     "bluebird": "^2.9.25",
     "immutable": "^3.7.5",
+    "lodash": "^4.13.1",
     "rx": "^3.0.0",
     "validator": "^4.0.3"
   },

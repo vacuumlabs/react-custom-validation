@@ -3,7 +3,9 @@
 import React from 'react'
 import Promise from 'bluebird'
 import {
-  Validate,
+  validated,
+  withFancySubmit,
+  initial,
   IsEmail,
   IsRequired,
   HasNumber,
@@ -11,7 +13,7 @@ import {
   AreSame} from '../lib/validation'
 import {Input, Grid, Row, Col, Panel, Button} from 'react-bootstrap'
 import {valid, invalid} from '../lib/Rules'
-
+import {cloneDeep} from 'lodash'
 
 function IsUnique({value, time}) {
   let isValid = value.indexOf('used') === -1
@@ -19,143 +21,247 @@ function IsUnique({value, time}) {
   return Promise.delay(time).then(() => response)
 }
 
+function time() {
+  return new Date().getTime()
+}
+
+function validity(validationData) {
+  let result = true
+  for (let name of Object.keys(validationData)) {
+    let v = validationData[name].validationResult.valid
+    if (v === false) {
+      return false
+    }
+    if (v == null) {
+      result = null
+    }
+  }
+  return result
+}
+
+function style(validationData) {
+  let {validationResult: {valid}, showValidation} = validationData
+  if (showValidation && valid === true) return 'success'
+  if (showValidation && valid === false) return 'error'
+  return null
+}
+
+function validationMessage(validationData) {
+  let {validationResult: {valid, error, rule}, showValidation} = validationData
+  let message = {
+    null: 'Validating...',
+    true: 'Valid!',
+    false: `Invalid (rule: ${rule}, error: ${error})`
+  }[valid]
+
+  return showValidation ? message : null
+}
+
+// Wrapper providing poor man's flux
 export class App extends React.Component {
 
   constructor(props) {
     super(props)
-    let state = {}
-    for (let field of ['email', 'password', 'rePassword']) {
-      state[field] = {value: '', message: '', showValidation: false}
-    }
-    this.state = state
-    this.__validationData = []
-  }
-
-  setFieldState(field, newState) {
-    this.setState({[field]: {...this.state[field], ...newState}})
-  }
-
-  handleValidation = (field) => ({validationResult, showValidation}) => {
-    this.__validationData.unshift({validationResult, showValidation})
-    let {message, showValidation: show, valid} = {...this.state[field]}
-
-    if (validationResult != null) {
-      valid = validationResult.valid
-      let {error, rule} = validationResult
-      if (valid == null) message = 'Validating...'
-      if (valid === true) message = 'Valid!'
-      if (valid === false) message = `Invalid (rule: ${rule}, error: ${error})`
-    }
-
-    show = showValidation != null ? showValidation : show
-
-    this.setFieldState(field, {message, showValidation: show, valid})
-  }
-
-  showValidation = (field) => () => {
-    this.setFieldState(field, {showValidation: true})
-  }
-
-  renderMessage(field) {
-    let {showValidation, message} = this.state[field]
-    return showValidation ? message : null
-  }
-
-  allValid() {
-    for (let field of ['email', 'password', 'rePassword']) {
-      if (this.state[field].valid === false) return false
-    }
-    return true
-  }
-
-  showAllValidations() {
-    for (let field of ['email', 'password', 'rePassword']) {
-      this.showValidation(field)
+    let init = {value: '', lastBlur: null, lastChange: null}
+    this.state = {
+      appState: {
+        lastSumbit: null,
+        fields: {
+          email: {...init},
+          password: {...init},
+          rePassword: {...init},
+        },
+        validations: {
+          email: initial(),
+          password: initial(),
+          passwordsMatch: initial(),
+        }
+      }
     }
   }
 
-  renderField(name, label, data) {
-    let {value, valid, message, showValidation} = data
-    let style
-    if (showValidation && valid === true) style = 'success'
-    if (showValidation && valid === false) style = 'error'
-
-    let handleChange = (e) => {
-      this.setFieldState(name, {value: e.target.value})
-    }
-
-    return (
-      <Row>
-        <Col md={4}>
-          <Input
-                type="text"
-                id={name}
-                label={label}
-                onChange={handleChange}
-                onBlur={this.showValidation(name)}
-                bsStyle={style}
-                hasFeedback
-                value={value} />
-        </Col>
-        <Col md={4}>
-          <div>{showValidation ? message : null}</div>
-        </Col>
-      </Row>)
+  dispatch = ({fn, description}) => {
+    this.setState((state) => {
+      console.log(description) //eslint-disable-line no-console
+      console.log(//eslint-disable-line no-console
+        `New app state: ${JSON.stringify(fn(this.state.appState))}`
+      )
+      return {appState: fn(state.appState)}
+    })
   }
 
   render() {
-    let {
-      email: {value: email},
-      password: {value: password},
-      rePassword: {value: rePassword}} = this.state
+    return <Registration appState={this.state.appState} dispatch={this.dispatch} />
+  }
+}
+
+@validated((props) => {
+  let {
+    appState: {
+      fields,
+      fields: {
+        lastSubmit,
+        email: {value: email},
+        password: {value: password},
+        rePassword: {value: rePassword},
+      }
+    },
+    dispatch
+  } = props
+
+  function updateValidationData(name) {
+    return (data) => {
+      dispatch({
+        fn: (state) => {
+          // poor man's immutability
+          let newState = cloneDeep(state)
+          newState.validations[name] = {...state.validations[name], ...data}
+          return newState
+        },
+        description: `Got data for ${name} validation: ${JSON.stringify(data)}`
+      })
+    }
+  }
+
+  return {
+    email: {
+      rules: {
+        //isRequired: {fn: () => IsRequired({value: email})}, // very bad
+        isRequired: {fn: IsRequired, args: {value: email}},
+        isEmail: {fn: IsEmail, args: {value: email}},
+        isUnique: {fn: IsUnique, args: {time: 1000, value: email}}
+      },
+      fields: {email: {...fields.email, lastSubmit}},
+      onValidation: updateValidationData('email'),
+    },
+    password: {
+      rules: {
+        isRequired: {fn: IsRequired, args: {value: password}},
+        hasLength: {fn: HasLength, args: {value: password, min: 6, max: 10}},
+        hasNumber: {fn: HasNumber, args: {value: password}}
+      },
+      fields: {password: {...fields.password, lastSubmit}},
+      onValidation: updateValidationData('password'),
+    },
+    passwordsMatch: {
+      rules: {
+        areSame: {fn: AreSame, args: {value1: password, value2: rePassword}},
+      },
+      fields: {
+        password: {...fields.password, lastSubmit},
+        rePassword: {...fields.rePassword, lastSubmit}
+      },
+      onValidation: updateValidationData('passwordsMatch'),
+    },
+  }
+})
+@withFancySubmit((props) => {
+  // When user clicks on the submit button, wait until validity of the form is known (!= null) and
+  // only then proceed with the onSubmit handler.
+  let {appState: {fields: {lastSubmit}, validations}} = props
+  return {
+    formValid: validity(validations),
+    lastSubmit,
+    onSubmit: (valid) => {
+      if (valid) {
+        alert('Registration successful!') //eslint-disable-line no-alert
+      } else {
+        // do nothing
+      }
+    },
+  }
+})
+export class Registration extends React.Component {
+
+  static propTypes = {
+    appState: React.PropTypes.object.isRequired,
+    dispatch: React.PropTypes.func.isRequired,
+  }
+
+  renderField(name, label, style) {
+    let update = (data) => {
+      this.props.dispatch({
+        fn: (state) => {
+          // poor man's immutability
+          let newState = cloneDeep(state)
+          newState.fields[name] = {...state.fields[name], ...data}
+          return newState
+        },
+        description: `Updating field ${name} with data: ${JSON.stringify(data)}`
+      })
+    }
+
+    return (
+      <Input
+        type="text"
+        id={name}
+        label={label}
+        onChange={(e) => update({value: e.target.value, lastChange: time()})}
+        onBlur={(e) => update({lastBlur: time()})}
+        bsStyle={style}
+        hasFeedback
+        value={this.props.appState.fields[name].value}
+      />
+    )
+  }
+
+  render() {
+    let vs = this.props.appState.validations
 
     return (
       <div>
         <Panel header={"Registration"}>
-          <form onSubmit={this.onSubmit}>
+          <form onSubmit={
+            (e) => {
+              e.preventDefault()
+              this.props.dispatch({
+                fn: (state) => {
+                  // poor man's immutability
+                  let newState = cloneDeep(state)
+                  // set info about lastSubmit to app state, the rest is taken care of by the
+                  // withFancySubmit h.o.c. (see above)
+                  newState.fields.lastSubmit = time()
+                  return newState
+                },
+                description: `Updating lastSubmit`
+              })
+            }
+          }>
             <Grid>
-              {this.renderField('email', 'E-mail', this.state.email)}
-              <Validate onValidation={this.handleValidation('email')} >
-                <IsRequired key="is-required" value={email} />
-                <IsEmail key="is-email" value={email} />
-                <IsUnique time={1000} value={email} />
-              </Validate>
-
-              {this.renderField('password', 'Password', this.state.password)}
-              <Validate
-                onValidation={this.handleValidation('password')}
-                args={{value: password}}
-              >
-                <IsRequired key='is-required' />
-                <HasLength key='has-length' min={6} max={10} />
-                <HasNumber key='has-number' />
-              </Validate>
-
-              {this.renderField(
-                'rePassword', 'Repeat password', this.state.rePassword)}
-              <Validate
-                onValidation={this.handleValidation('rePassword')}
-                needTouch={[['are-same', 'value1'], ['are-same', 'value2']]} >
-                <AreSame key='are-same' value1={password} value2={rePassword} />
-              </Validate>
+              <Row>
+                <Col md={4}>
+                  {this.renderField('email', 'E-mail', style(vs.email))}
+                </Col>
+                <Col md={4}>
+                  {validationMessage(vs.email)}
+                </Col>
+              </Row>
+              <Row>
+                <Col md={4}>
+                  {this.renderField('password', 'Password', style(vs.password))}
+                </Col>
+                <Col md={4}>
+                  {validationMessage(vs.password)}
+                </Col>
+              </Row>
+              <Row>
+                <Col md={4}>
+                  {this.renderField('rePassword', 'Repeat password', style(vs.passwordsMatch))}
+                </Col>
+                <Col md={4}>
+                  {validationMessage(vs.passwordsMatch)}
+                </Col>
+              </Row>
 
               <Row>
                 <Col>
-                  <Button
-                    bsStyle="primary"
-                    onClick={() => this.showAllValidations()}
-                    disabled={!this.allValid()}>
+                  <Button bsStyle="primary" type="submit">
                     Register
                   </Button>
                 </Col>
               </Row>
             </Grid>
           </form>
-        </Panel>
-        <Panel header={"Validation Data"}>
-          {this.__validationData.map((data) => {
-            return <div>{JSON.stringify(data)}</div>
-          })}
         </Panel>
       </div>
     )
