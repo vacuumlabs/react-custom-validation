@@ -28,8 +28,7 @@ function time() {
 // TODOMH move to the correct place
 function validity(validationData) {
   let result = true
-  // TODOMH use for-in to itterate over keys in map
-  for (let name of Object.keys(validationData)) {
+  for (let name in validationData) {
     let v = validationData[name].validationResult.valid
     if (v === false) {
       return false
