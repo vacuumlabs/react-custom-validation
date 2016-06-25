@@ -4,7 +4,7 @@ import React from 'react'
 import Promise from 'bluebird'
 import {
   validated,
-  withFancySubmit,
+  provideOnFormValid,
   initValidation,
   initField,
   validity,
@@ -53,9 +53,9 @@ export class App extends React.Component {
     super(props)
     this.state = {
       appState: {
-        lastSumbit: null,
+        lastSubmit: null,
         fields: {
-          email: initField(true),
+          email: initField(),
           password: initField(),
           rePassword: initField(),
         },
@@ -99,7 +99,8 @@ function updateValidation(name, dispatch) {
 function validations(props) {
   let {
     appState: {
-      fields: {lastSubmit, email, password, rePassword}
+      lastSubmit,
+      fields: {email, password, rePassword}
     },
     dispatch
   } = props
@@ -137,29 +138,24 @@ function validations(props) {
   }
 }
 
-@validated(validations)
-// TODOMH rename to 'provideSubmit'
-@withFancySubmit((props) => {
-  // When user clicks on the submit button, wait until validity of the form is known (!= null) and
-  // only then proceed with the onSubmit handler.
-  let {appState: {fields: {lastSubmit}, validations}} = props
+function getFormValidity(props) {
+  let {appState: {validations, fields}} = props
   return {
     formValid: validity(validations),
-    lastSubmit,
-    onSubmit: (valid) => {
-      if (valid) {
-        alert('Registration successful!') //eslint-disable-line no-alert
-      } else {
-        // do nothing
-      }
-    },
+    // if fields are provided, check for value changes and cancel the handler if
+    // changes were made
+    fields,
   }
-})
+}
+
+@validated(validations)
+@provideOnFormValid(getFormValidity)
 export class Registration extends React.Component {
 
   static propTypes = {
     appState: React.PropTypes.object.isRequired,
     dispatch: React.PropTypes.func.isRequired,
+    onFormValid: React.PropTypes.func.isRequired,
   }
 
   renderField(name, label, style) {
@@ -198,20 +194,21 @@ export class Registration extends React.Component {
               e.preventDefault()
               this.props.dispatch({
                 fn: (state) => {
-                  // set info about lastSubmit to app state, the rest is taken care of by the
-                  // withFancySubmit h.o.c. (see above)
-                  //
-                  // TODOMH: make submit work such as:
-                  //this.props.onValidForm((valid, props) => {
-                  //  if (valid) {
-                  //    //...
-                  //  }
-                  //})
-                  //
                   // create new state with updated lastSubmit, while keeping the old state the same
-                  return R.assocPath(['fields', 'lastSubmit'], time(), state)
+                  return R.assocPath(['lastSubmit'], time(), state)
                 },
                 description: `Updating lastSubmit`
+              })
+              // When user clicks on the submit button, wait until validity of
+              // the form is known (!= null) and only then proceed with the
+              // onSubmit handler.
+              this.props.onFormValid((valid, props) => {
+                if (valid) {
+                  // use props provided by onFormValid, these are guaranteed to
+                  // have valid data
+                  let {fields: {email}} = props.appState
+                  alert(`Registration successful! Email=${email}`) //eslint-disable-line no-alert
+                }
               })
             }
           }>
