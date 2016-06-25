@@ -104,7 +104,29 @@ export class App extends React.Component {
    class Component { ... }
 */
 
-@validated((props) => {
+function updateValidation(name, dispatch) {
+  return (data) => {
+    dispatch({
+      fn: (state) => {
+        // TODOMH what about:
+        // newState = {...state, validations:
+        //   {...state.validations, [name]: {...state.validations[name], ...data}}}
+        // or:
+        // newState = R.assocPath(
+        //   ['validations', name], {...state.validations[name], ...data}, state)
+        // R being 'ramda' module
+
+        // poor man's immutability
+        let newState = cloneDeep(state)
+        newState.validations[name] = {...state.validations[name], ...data}
+        return newState
+      },
+      description: `Got data for ${name} validation: ${JSON.stringify(data)}`
+    })
+  }
+}
+
+function getValidationConstructionData(props) {
   let {
     appState: {
       fields,
@@ -118,27 +140,6 @@ export class App extends React.Component {
     dispatch
   } = props
 
-  // TODOMH: put to outer scope
-  function updateValidationData(name) {
-    return (data) => {
-      dispatch({
-        fn: (state) => {
-          // TODOMH what about:
-          // newState = {...state, validations: {...state.validations, [name]: {...state.validations[name], ...data}}}
-          // or:
-          // newState = R.assocPath(['validations', name], {...state.validations[name], ...data}, state)
-          // R being 'ramda' module
-
-          // poor man's immutability
-          let newState = cloneDeep(state)
-          newState.validations[name] = {...state.validations[name], ...data}
-          return newState
-        },
-        description: `Got data for ${name} validation: ${JSON.stringify(data)}`
-      })
-    }
-  }
-
   return {
     // TODOMH make 'lastsubmit' global, as we discussed
     email: {
@@ -150,8 +151,7 @@ export class App extends React.Component {
         isUnique: {fn: IsUnique, args: {time: 1000, value: email}}
       },
       fields: {email: {...fields.email, lastSubmit}},
-      // TODOMH rename updateValidationData -> updateValidation
-      onValidation: updateValidationData('email'),
+      onValidation: updateValidation('email', dispatch),
     },
     password: {
       rules: {
@@ -160,7 +160,7 @@ export class App extends React.Component {
         hasNumber: {fn: HasNumber, args: {value: password}}
       },
       fields: {password: {...fields.password, lastSubmit}},
-      onValidation: updateValidationData('password'),
+      onValidation: updateValidation('password', dispatch),
     },
     passwordsMatch: {
       rules: {
@@ -170,10 +170,12 @@ export class App extends React.Component {
         password: {...fields.password, lastSubmit},
         rePassword: {...fields.rePassword, lastSubmit}
       },
-      onValidation: updateValidationData('passwordsMatch'),
+      onValidation: updateValidation('passwordsMatch', dispatch),
     },
   }
-})
+}
+
+@validated(getValidationConstructionData)
 // TODOMH rename to 'provideSubmit'
 @withFancySubmit((props) => {
   // When user clicks on the submit button, wait until validity of the form is known (!= null) and
