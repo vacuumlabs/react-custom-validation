@@ -25,8 +25,10 @@ function time() {
   return new Date().getTime()
 }
 
+// TODOMH move to the correct place
 function validity(validationData) {
   let result = true
+  // TODOMH use for-in to itterate over keys in map
   for (let name of Object.keys(validationData)) {
     let v = validationData[name].validationResult.valid
     if (v === false) {
@@ -57,11 +59,14 @@ function validationMessage(validationData) {
   return showValidation ? message : null
 }
 
+// TODOMH retext flux -> redux
 // Wrapper providing poor man's flux
 export class App extends React.Component {
 
   constructor(props) {
     super(props)
+    // TODOMH why not take this also from the validation library? Also, I'd rename it to:
+    // initField() and initValidation()
     let init = {value: '', lastBlur: null, lastChange: null}
     this.state = {
       appState: {
@@ -95,6 +100,14 @@ export class App extends React.Component {
   }
 }
 
+/* TODOMH: structure the code such as:
+
+   const validations = (props) => long factory for validation config
+
+   @validated(validations)
+   class Component { ... }
+*/
+
 @validated((props) => {
   let {
     appState: {
@@ -109,10 +122,17 @@ export class App extends React.Component {
     dispatch
   } = props
 
+  // TODOMH: put to outer scope
   function updateValidationData(name) {
     return (data) => {
       dispatch({
         fn: (state) => {
+          // TODOMH what about:
+          // newState = {...state, validations: {...state.validations, [name]: {...state.validations[name], ...data}}}
+          // or:
+          // newState = R.assocPath(['validations', name], {...state.validations[name], ...data}, state)
+          // R being 'ramda' module
+
           // poor man's immutability
           let newState = cloneDeep(state)
           newState.validations[name] = {...state.validations[name], ...data}
@@ -124,14 +144,17 @@ export class App extends React.Component {
   }
 
   return {
+    // TODOMH make 'lastsubmit' global, as we discussed
     email: {
       rules: {
+        // TODOMH is this 'very bad' already explicitely checked for?
         //isRequired: {fn: () => IsRequired({value: email})}, // very bad
         isRequired: {fn: IsRequired, args: {value: email}},
         isEmail: {fn: IsEmail, args: {value: email}},
         isUnique: {fn: IsUnique, args: {time: 1000, value: email}}
       },
       fields: {email: {...fields.email, lastSubmit}},
+      // TODOMH rename updateValidationData -> updateValidation
       onValidation: updateValidationData('email'),
     },
     password: {
@@ -155,6 +178,7 @@ export class App extends React.Component {
     },
   }
 })
+// TODOMH rename to 'provideSubmit'
 @withFancySubmit((props) => {
   // When user clicks on the submit button, wait until validity of the form is known (!= null) and
   // only then proceed with the onSubmit handler.
@@ -206,6 +230,7 @@ export class Registration extends React.Component {
   }
 
   render() {
+    // TODOMH vs -> validations ?
     let vs = this.props.appState.validations
 
     return (
@@ -221,6 +246,12 @@ export class Registration extends React.Component {
                   // set info about lastSubmit to app state, the rest is taken care of by the
                   // withFancySubmit h.o.c. (see above)
                   newState.fields.lastSubmit = time()
+                  // TODOMH: make submit work such as:
+                  //this.props.onValidForm((valid, props) => {
+                  //  if (valid) {
+                  //    //...
+                  //  }
+                  //})
                   return newState
                 },
                 description: `Updating lastSubmit`
