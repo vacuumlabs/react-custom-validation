@@ -1,4 +1,5 @@
-export {Validation, initial} from './Validation'
+export {Validation} from './Validation'
+export {initValidation, initField} from './helpers'
 export {validated} from './validated'
 export {withFancySubmit} from './withFancySubmit'
 export {IsEmail, IsRequired, HasNumber, HasLength, AreSame} from './Rules'

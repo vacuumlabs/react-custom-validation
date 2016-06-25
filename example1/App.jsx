@@ -5,7 +5,8 @@ import Promise from 'bluebird'
 import {
   validated,
   withFancySubmit,
-  initial,
+  initValidation,
+  initField,
   IsEmail,
   IsRequired,
   HasNumber,
@@ -58,27 +59,23 @@ function validationMessage(validationData) {
   return showValidation ? message : null
 }
 
-// TODOMH retext flux -> redux
-// Wrapper providing poor man's flux
+// Wrapper providing poor man's redux
 export class App extends React.Component {
 
   constructor(props) {
     super(props)
-    // TODOMH why not take this also from the validation library? Also, I'd rename it to:
-    // initField() and initValidation()
-    let init = {value: '', lastBlur: null, lastChange: null}
     this.state = {
       appState: {
         lastSumbit: null,
         fields: {
-          email: {...init},
-          password: {...init},
-          rePassword: {...init},
+          email: initField(),
+          password: initField(),
+          rePassword: initField(),
         },
         validations: {
-          email: initial(),
-          password: initial(),
-          passwordsMatch: initial(),
+          email: initValidation(),
+          password: initValidation(),
+          passwordsMatch: initValidation(),
         }
       }
     }
