@@ -32,6 +32,7 @@
     "gulp-eslint": "^1.0.0",
     "gulp-nodemon": "^1.0.5",
     "gulp-sourcemaps": "^1.5.2",
+    "ramda": "^0.21.0",
     "reactify": "^1.0.0",
     "react": "^0.14.1",
     "react-bootstrap": "^0.27.3",

@@ -7,6 +7,7 @@ import {
   withFancySubmit,
   initValidation,
   initField,
+  validity,
   IsEmail,
   IsRequired,
   HasNumber,
@@ -14,6 +15,7 @@ import {
   AreSame} from '../lib/validation'
 import {Input, Grid, Row, Col, Panel, Button} from 'react-bootstrap'
 import {valid, invalid} from '../lib/Rules'
+import R from 'ramda'
 import {cloneDeep} from 'lodash'
 
 function IsUnique({value, time}) {
@@ -24,21 +26,6 @@ function IsUnique({value, time}) {
 
 function time() {
   return new Date().getTime()
-}
-
-// TODOMH move to the correct place
-function validity(validationData) {
-  let result = true
-  for (let name in validationData) {
-    let v = validationData[name].validationResult.valid
-    if (v === false) {
-      return false
-    }
-    if (v == null) {
-      result = null
-    }
-  }
-  return result
 }
 
 function style(validationData) {
@@ -68,7 +55,7 @@ export class App extends React.Component {
       appState: {
         lastSumbit: null,
         fields: {
-          email: initField(),
+          email: initField(true),
           password: initField(),
           rePassword: initField(),
         },
@@ -85,8 +72,7 @@ export class App extends React.Component {
     this.setState((state) => {
       console.log(description) //eslint-disable-line no-console
       console.log(//eslint-disable-line no-console
-        `New app state: ${JSON.stringify(fn(this.state.appState))}`
-      )
+        'New app state:', cloneDeep(fn(state.appState)))
       return {appState: fn(state.appState)}
     })
   }
@@ -96,86 +82,62 @@ export class App extends React.Component {
   }
 }
 
-/* TODOMH: structure the code such as:
-
-   const validations = (props) => long factory for validation config
-
-   @validated(validations)
-   class Component { ... }
-*/
-
 function updateValidation(name, dispatch) {
   return (data) => {
     dispatch({
       fn: (state) => {
-        // TODOMH what about:
-        // newState = {...state, validations:
-        //   {...state.validations, [name]: {...state.validations[name], ...data}}}
-        // or:
-        // newState = R.assocPath(
-        //   ['validations', name], {...state.validations[name], ...data}, state)
-        // R being 'ramda' module
-
-        // poor man's immutability
-        let newState = cloneDeep(state)
-        newState.validations[name] = {...state.validations[name], ...data}
-        return newState
+        // create new state with updated validation data, while keeping the old state the same
+        return R.assocPath(['validations', name], {...state.validations[name], ...data}, state)
       },
       description: `Got data for ${name} validation: ${JSON.stringify(data)}`
     })
   }
 }
 
-function getValidationConstructionData(props) {
+// Define function describing what validations should be performed with the
+// form data
+function validations(props) {
   let {
     appState: {
-      fields,
-      fields: {
-        lastSubmit,
-        email: {value: email},
-        password: {value: password},
-        rePassword: {value: rePassword},
-      }
+      fields: {lastSubmit, email, password, rePassword}
     },
     dispatch
   } = props
 
   return {
-    // TODOMH make 'lastsubmit' global, as we discussed
     email: {
       rules: {
-        // TODOMH is this 'very bad' already explicitely checked for?
-        //isRequired: {fn: () => IsRequired({value: email})}, // very bad
-        isRequired: {fn: IsRequired, args: {value: email}},
-        isEmail: {fn: IsEmail, args: {value: email}},
-        isUnique: {fn: IsUnique, args: {time: 1000, value: email}}
+        // The `fn` argument associated with a given rule name has to be
+        // constant (lambda functions are not allowed)
+        isRequired: {fn: IsRequired, args: {value: email.value}},
+        isEmail: {fn: IsEmail, args: {value: email.value}},
+        isUnique: {fn: IsUnique, args: {time: 1000, value: email.value}}
       },
-      fields: {email: {...fields.email, lastSubmit}},
+      fields: {email},
       onValidation: updateValidation('email', dispatch),
     },
     password: {
       rules: {
-        isRequired: {fn: IsRequired, args: {value: password}},
-        hasLength: {fn: HasLength, args: {value: password, min: 6, max: 10}},
-        hasNumber: {fn: HasNumber, args: {value: password}}
+        isRequired: {fn: IsRequired, args: {value: password.value}},
+        hasLength: {fn: HasLength, args: {value: password.value, min: 6, max: 10}},
+        hasNumber: {fn: HasNumber, args: {value: password.value}}
       },
-      fields: {password: {...fields.password, lastSubmit}},
+      fields: {password},
       onValidation: updateValidation('password', dispatch),
     },
     passwordsMatch: {
       rules: {
-        areSame: {fn: AreSame, args: {value1: password, value2: rePassword}},
+        areSame: {fn: AreSame, args: {value1: password.value, value2: rePassword.value}},
       },
-      fields: {
-        password: {...fields.password, lastSubmit},
-        rePassword: {...fields.rePassword, lastSubmit}
-      },
+      fields: {password, rePassword},
       onValidation: updateValidation('passwordsMatch', dispatch),
     },
+    // Providing __lastSubmit here adds it to all field data
+    __lastSubmit: lastSubmit
   }
 }
 
-@validated(getValidationConstructionData)
+@validated(validations)
 // TODOMH rename to 'provideSubmit'
 @withFancySubmit((props) => {
   // When user clicks on the submit button, wait until validity of the form is known (!= null) and
@@ -204,10 +166,8 @@ export class Registration extends React.Component {
     let update = (data) => {
       this.props.dispatch({
         fn: (state) => {
-          // poor man's immutability
-          let newState = cloneDeep(state)
-          newState.fields[name] = {...state.fields[name], ...data}
-          return newState
+          // create new state with updated field data, while keeping the old state the same
+          return R.assocPath(['fields', name], {...state.fields[name], ...data}, state)
         },
         description: `Updating field ${name} with data: ${JSON.stringify(data)}`
       })
@@ -228,8 +188,7 @@ export class Registration extends React.Component {
   }
 
   render() {
-    // TODOMH vs -> validations ?
-    let vs = this.props.appState.validations
+    let vdata = this.props.appState.validations
 
     return (
       <div>
@@ -239,18 +198,18 @@ export class Registration extends React.Component {
               e.preventDefault()
               this.props.dispatch({
                 fn: (state) => {
-                  // poor man's immutability
-                  let newState = cloneDeep(state)
                   // set info about lastSubmit to app state, the rest is taken care of by the
                   // withFancySubmit h.o.c. (see above)
-                  newState.fields.lastSubmit = time()
+                  //
                   // TODOMH: make submit work such as:
                   //this.props.onValidForm((valid, props) => {
                   //  if (valid) {
                   //    //...
                   //  }
                   //})
-                  return newState
+                  //
+                  // create new state with updated lastSubmit, while keeping the old state the same
+                  return R.assocPath(['fields', 'lastSubmit'], time(), state)
                 },
                 description: `Updating lastSubmit`
               })
@@ -259,26 +218,26 @@ export class Registration extends React.Component {
             <Grid>
               <Row>
                 <Col md={4}>
-                  {this.renderField('email', 'E-mail', style(vs.email))}
+                  {this.renderField('email', 'E-mail', style(vdata.email))}
                 </Col>
                 <Col md={4}>
-                  {validationMessage(vs.email)}
-                </Col>
-              </Row>
-              <Row>
-                <Col md={4}>
-                  {this.renderField('password', 'Password', style(vs.password))}
-                </Col>
-                <Col md={4}>
-                  {validationMessage(vs.password)}
+                  {validationMessage(vdata.email)}
                 </Col>
               </Row>
               <Row>
                 <Col md={4}>
-                  {this.renderField('rePassword', 'Repeat password', style(vs.passwordsMatch))}
+                  {this.renderField('password', 'Password', style(vdata.password))}
                 </Col>
                 <Col md={4}>
-                  {validationMessage(vs.passwordsMatch)}
+                  {validationMessage(vdata.password)}
+                </Col>
+              </Row>
+              <Row>
+                <Col md={4}>
+                  {this.renderField('rePassword', 'Repeat password', style(vdata.passwordsMatch))}
+                </Col>
+                <Col md={4}>
+                  {validationMessage(vdata.passwordsMatch)}
                 </Col>
               </Row>
 
