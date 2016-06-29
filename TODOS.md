@@ -3,3 +3,4 @@
    considered for type='text'
 3. Documentation:
      error in validation result may be JSONifiable object
+4. Update dependencies
