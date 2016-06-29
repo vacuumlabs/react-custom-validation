@@ -4,9 +4,7 @@ import React from 'react'
 import Promise from 'bluebird'
 import {
   validated,
-  provideOnFormValid,
   initValidation,
-  initField,
   validity,
   IsEmail,
   IsRequired,
@@ -24,26 +22,22 @@ function IsUnique({value, time}) {
   return Promise.delay(time).then(() => response)
 }
 
-function time() {
-  return new Date().getTime()
-}
-
 function style(validationData) {
-  let {validationResult: {valid}, showValidation} = validationData
-  if (showValidation && valid === true) return 'success'
-  if (showValidation && valid === false) return 'error'
+  let {result: {valid}, show} = validationData
+  if (show && valid === true) return 'success'
+  if (show && valid === false) return 'error'
   return null
 }
 
 function validationMessage(validationData) {
-  let {validationResult: {valid, error, rule}, showValidation} = validationData
+  let {result: {valid, error, rule}, show} = validationData
   let message = {
     null: 'Validating...',
     true: 'Valid!',
     false: `Invalid (rule: ${rule}, error: ${error})`
   }[valid]
 
-  return showValidation ? message : null
+  return show ? message : null
 }
 
 // Wrapper providing poor man's redux
@@ -53,12 +47,7 @@ export class App extends React.Component {
     super(props)
     this.state = {
       appState: {
-        lastSubmit: null,
-        fields: {
-          email: initField(),
-          password: initField(),
-          rePassword: initField(),
-        },
+        fields: {email: '', password: '', rePassword: ''},
         validations: {
           email: initValidation(),
           password: initValidation(),
@@ -82,90 +71,91 @@ export class App extends React.Component {
   }
 }
 
-function updateValidation(name, dispatch) {
-  return (data) => {
-    dispatch({
-      fn: (state) => {
-        // create new state with updated validation data, while keeping the old state the same
-        return R.assocPath(['validations', name], {...state.validations[name], ...data}, state)
-      },
-      description: `Got data for ${name} validation: ${JSON.stringify(data)}`
-    })
-  }
+function updateValidation(dispatch, name, data) {
+  dispatch({
+    fn: (state) => {
+      // create new state with updated validation data, while keeping the old state the same
+      return R.assocPath(['validations', name], {...state.validations[name], ...data}, state)
+    },
+    description: `Got data for ${name} validation: ${JSON.stringify(data)}`
+  })
 }
 
-// Define function describing what validations should be performed with the
-// form data
-function validations(props) {
+function removeValidation(dispatch, name) {
+  dispatch({
+    // remove validation data with given name
+    fn: (state) => R.dissocPath(['validations', name], state),
+    description: `Remove validation ${name}`
+  })
+}
+
+function validationConfig(props) {
   let {
     appState: {
-      lastSubmit,
-      fields: {email, password, rePassword}
+      fields,
+      fields: {email, password, rePassword},
+      validations,
     },
     dispatch
   } = props
 
   return {
-    email: {
-      rules: {
-        // The `fn` argument associated with a given rule name has to be
-        // constant (lambda functions are not allowed)
-        isRequired: {fn: IsRequired, args: {value: email.value}},
-        isEmail: {fn: IsEmail, args: {value: email.value}},
-        isUnique: {fn: IsUnique, args: {time: 1000, value: email.value}}
-      },
-      fields: {email},
-      onValidation: updateValidation('email', dispatch),
-    },
-    password: {
-      rules: {
-        isRequired: {fn: IsRequired, args: {value: password.value}},
-        hasLength: {fn: HasLength, args: {value: password.value, min: 6, max: 10}},
-        hasNumber: {fn: HasNumber, args: {value: password.value}}
-      },
-      fields: {password},
-      onValidation: updateValidation('password', dispatch),
-    },
-    passwordsMatch: {
-      rules: {
-        areSame: {fn: AreSame, args: {value1: password.value, value2: rePassword.value}},
-      },
-      fields: {password, rePassword},
-      onValidation: updateValidation('passwordsMatch', dispatch),
-    },
-    // Providing __lastSubmit here adds it to all field data
-    __lastSubmit: lastSubmit
-  }
-}
-
-function getFormValidity(props) {
-  let {appState: {validations, fields}} = props
-  return {
+    fields, // key-value pairs for all fields that require validation
     formValid: validity(validations),
-    // if fields are provided, check for value changes and cancel the handler if
-    // changes were made
-    fields,
+    // specify what should happen when new validation data is available
+    onValidation: (name, data) => updateValidation(dispatch, name, data),
+    // onDestroy is optional, default implementation will be used if not provided
+    // specify what should happen when validation `name` is no longer present
+    onDestroy: (name) => removeValidation(dispatch, name),
+    validations: {
+      email: {
+        rules: {
+          // The `fn` argument associated with a given rule name has to be
+          // constant (lambda functions are not allowed)
+          isRequired: {fn: IsRequired, args: {value: email}},
+          isEmail: {fn: IsEmail, args: {value: email}},
+          isUnique: {fn: IsUnique, args: {time: 1000, value: email}}
+        },
+        fields: 'email', // field(s) validated by this set of rules
+      },
+      password: {
+        rules: {
+          isRequired: {fn: IsRequired, args: {value: password}},
+          hasLength: {fn: HasLength, args: {value: password, min: 6, max: 10}},
+          hasNumber: {fn: HasNumber, args: {value: password}}
+        },
+        fields: 'password',
+      },
+      passwordsMatch: {
+        rules: {
+          areSame: {fn: AreSame, args: {value1: password, value2: rePassword}},
+        },
+        fields: ['password', 'rePassword'],
+      },
+    },
   }
 }
 
-@validated(validations)
-@provideOnFormValid(getFormValidity)
+@validated(validationConfig)
 export class Registration extends React.Component {
 
   static propTypes = {
     appState: React.PropTypes.object.isRequired,
     dispatch: React.PropTypes.func.isRequired,
     onFormValid: React.PropTypes.func.isRequired,
+    handleEvent: React.PropTypes.func.isRequired,
   }
 
   renderField(name, label, style) {
-    let update = (data) => {
+    let {handleEvent} = this.props
+
+    let update = (value) => {
       this.props.dispatch({
         fn: (state) => {
-          // create new state with updated field data, while keeping the old state the same
-          return R.assocPath(['fields', name], {...state.fields[name], ...data}, state)
+          // create new state with updated field value, while keeping the old state the same
+          return R.assocPath(['fields', name], value, state)
         },
-        description: `Updating field ${name} with data: ${JSON.stringify(data)}`
+        description: `Update field ${name} to value ${value}`
       })
     }
 
@@ -174,8 +164,11 @@ export class Registration extends React.Component {
         type="text"
         id={name}
         label={label}
-        onChange={(e) => update({value: e.target.value, lastChange: time()})}
-        onBlur={(e) => update({lastBlur: time()})}
+        onChange={(e) => {
+          update(e.target.value)
+          handleEvent('change', name)
+        }}
+        onBlur={(e) => handleEvent('blur', name)}
         bsStyle={style}
         hasFeedback
         value={this.props.appState.fields[name].value}
@@ -192,20 +185,16 @@ export class Registration extends React.Component {
           <form onSubmit={
             (e) => {
               e.preventDefault()
-              this.props.dispatch({
-                fn: (state) => {
-                  // create new state with updated lastSubmit, while keeping the old state the same
-                  return R.assocPath(['lastSubmit'], time(), state)
-                },
-                description: `Updating lastSubmit`
-              })
+              this.props.handleEvent('submit')
               // When user clicks on the submit button, wait until validity of
               // the form is known (!= null) and only then proceed with the
               // onSubmit handler.
               this.props.onFormValid((valid, props) => {
                 if (valid) {
-                  // use props provided by onFormValid, these are guaranteed to
-                  // have valid data
+                  // It is recommended to use props provided to the handler
+                  // rather than this.props, as this.props might not be up-to
+                  // date if the validation took too long. The form data in
+                  // props are guaranteed to be valid.
                   let {fields: {email}} = props.appState
                   alert(`Registration successful! Email=${email}`) //eslint-disable-line no-alert
                 }

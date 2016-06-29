@@ -1,5 +1,4 @@
 export {Validation} from './Validation'
-export {initValidation, initField, validity} from './helpers'
+export {initValidation, validity} from './helpers'
 export {validated} from './validated'
-export {provideOnFormValid} from './onFormValid'
 export {IsEmail, IsRequired, HasNumber, HasLength, AreSame} from './Rules'
