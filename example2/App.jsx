@@ -14,9 +14,9 @@ import {cloneDeep} from 'lodash'
 import {style, validationMessage} from './helpers'
 import Name from './Name'
 
-function isTotalCountCorrect({totalCount, names}) {
+function isTotalCountCorrect({totalCount, count}) {
   let result
-  if (Object.keys(names).length === totalCount) {
+  if (count === totalCount) {
     result = valid()
   } else {
     result = invalid('Total count is incorrect!')
@@ -83,6 +83,7 @@ function validationConfig(props) {
   for (let n in names) {
     validations[n] = names[n].validations.names
   }
+  let count = Object.keys(names).length
 
   return {
     fields: {totalCount},
@@ -91,7 +92,7 @@ function validationConfig(props) {
     validations: {
       totalCount: {
         rules: {
-          isTotalCountCorrect: {fn: isTotalCountCorrect, args: {totalCount, names}},
+          isTotalCountCorrect: {fn: isTotalCountCorrect, args: {totalCount, count}},
         },
         fields: 'totalCount', // field(s) validated by this set of rules
       },
