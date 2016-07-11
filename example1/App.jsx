@@ -107,6 +107,7 @@ function validationConfig(props) {
     // onDestroy is optional, default implementation will be used if not provided
     // specify what should happen when validation `name` is no longer present
     onDestroy: (name) => removeValidation(dispatch, name),
+    debounce: 100, // throttle validity computations; optional; default = 100
     validations: {
       email: {
         rules: {
