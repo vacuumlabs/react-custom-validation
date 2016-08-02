@@ -1,17 +1,52 @@
 # React Validation Library
 
-Client-side validation library providing excellent user experience. The main
-features include:
+Client-side validation library that aims for the excellent user experience. Don't expect cheap magic
+here; we'll force you to write some ammount of code. It's the only way how to do really great
+validations.
+
+## Rationale
+
+With React and proper application state management system (for example, Redux) it's simple to
+validate things. All the data is available in the application state so obtaining the validity is as
+easy as applying validation functions to the appropriate arguments. Multiple fields validations and
+asynchronous validations do not complicate the story much.
+
+The real challenge for top-noch validated component is not computing actual validity of individual
+fields, but computing, whether the validation result should be showed to user. We strongly believe
+that these two aspects are completely orthogonal and should be treated so. Required field never
+touched? Invalid, but don't show it. Email field does not look e-mail-ish at all? Invalid, but
+don't show it, if user is still typing. If user changes focus to other field, show it ASAP! You see
+the picture.
+
+It turns out that whether the validation result should be presented to the user depends on many
+details: what inputs were already touched, when the last keystroke happened, whether user already
+attempted to submit the form.. For anything else than showing validation, such details are
+100% unimportant, so you don't capture and store such data in any way. The validation library therefore creates higher order component (HOC) that stores this information in it's internal component state. The contract is simple:
+
+- you configure, what validation rules exist and what fields affects what validations
+- you inform the validation component about all changes, blurs and submits user performs
+- validation component informs you, what is the status of individual validation: Whether the
+  validation is OK / not OK and whether you should / should't display validation status.
+
+## Feature set
+
 - Automatic re-calculation of validity when user changes the input value
 - Suggestions on show/hide the validation result
   - Hide validity while the user is typing
   - Hide validity if the field was not touched yet
   - Show the validity if the user finished typing
 - Easy definition and usage of custom validation rules
+- Multiple fields validation
+- Async validations
+- Debouncing / Throttling
+- Conditional validations
 - Flexibility and extensibility: can be easily combined with other validation approaches
 
+
+
 This library is intended to be used with React. It also plays well with Redux,
-but it can be used without Redux as well.
+but it can be used without Redux as well. It can be easily integrated with React-Intl or other
+(custom?) i18n solution.
 
 ## Try it out
 
@@ -40,9 +75,7 @@ class RegistrationForm extends React.Component {
         <input
           type="text"
           id="email"
-          onChange={(e) => {
-            this.props.dispatch({type: 'changeEmail', payload: e.target.value})
-          }}
+          onChange={changeEmail(e.target.value)}
           value={email}
         />
         { /* similar code for password and re-password inputs */ }
@@ -58,27 +91,25 @@ that calculate validation config from component's props:
 ```javascript
 function validationConfig(props) {
   let {
-    fields, 
+    fields,
     fields: {email, password, rePassword},
     validations,
-    dispatch
+    dispatch,
+    handleValidation
   } = props
 
   return {
-    fields, // key-value pairs for all fields that require validation
+    // list of names of all relevant fields
+    fields: Object.keys(fields),
+    // whether the whole form is valid
     formValid: validity(validations),
     // specify what should happen when new validation data is available
+    // for example, redux action creator, that will save the validation result to the application state
     onValidation: (name, data) => {
-      // save new validation data for validation with name `name` to the app
-      // state
-      dispatch({
-        fn: (state) => {
-          // create new state with updated validation data, while keeping the old state the same
-          return ramda.assocPath(['validations', name], {...state.validations[name], ...data}, state)
-        },
-        description: `Got data for ${name} validation: ${JSON.stringify(data)}`
-      })
+      handleValidation(name, data)
     },
+    // configure the validations itself. Here we specify 3 validations, each with different
+    // validation rules.
     validations: {
       email: {
         rules: {
@@ -86,7 +117,8 @@ function validationConfig(props) {
           isEmail: {fn: isEmail, args: {value: email}},
           isUnique: {fn: isUnique, args: {time: 1000, value: email}}
         },
-        fields: 'email', // field(s) validated by this set of rules
+        // field(s) validated by this set of rules. Important for validation-showing info.
+        fields: 'email',
       },
       password: {
         rules: {
@@ -313,7 +345,7 @@ longer found among `validations` in the config.
 If not provided, the following default implementation will be used:
 
 ```
-  (name) => handleValidation({result: {valid: true}, show: false}) 
+  (name) => handleValidation({result: {valid: true}, show: false})
 ```
 
 #### `debounce` (optional)
