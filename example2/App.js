@@ -7,7 +7,17 @@ import {
   initValidation,
   validity
 } from '../lib/validation'
-import {Input, Grid, Row, Col, Panel, Button} from 'react-bootstrap'
+import {
+  ControlLabel,
+  FormGroup,
+  FormControl,
+  HelpBlock,
+  Grid,
+  Row,
+  Col,
+  Panel,
+  Button
+} from 'react-bootstrap'
 import {valid, invalid} from '../lib/Rules'
 import R from 'ramda'
 import {cloneDeep} from 'lodash'
@@ -60,7 +70,7 @@ export class App extends React.Component {
   }
 
   render() {
-    return <Registration appState={this.state.appState} dispatch={this.dispatch} />
+    return <ValidatedRegistration appState={this.state.appState} dispatch={this.dispatch} />
   }
 }
 
@@ -100,8 +110,7 @@ function validationConfig(props) {
   }
 }
 
-@validated(validationConfig)
-export class Registration extends React.Component {
+class Registration extends React.Component {
 
   static propTypes = {
     appState: React.PropTypes.object.isRequired,
@@ -126,7 +135,7 @@ export class Registration extends React.Component {
         s = R.assoc('lastId', id + 1, s)
         return s
       },
-      description: `Add new name`
+      description: 'Add new name'
     })
   }
 
@@ -161,9 +170,9 @@ export class Registration extends React.Component {
               }
               this.props.onFormValid((valid, props) => {
                 if (valid) {
-                  alert(`Registration successful!`) //eslint-disable-line no-alert
+                  alert('Registration successful!') //eslint-disable-line no-alert
                 } else {
-                  alert(`There are errors in the form.`) //eslint-disable-line no-alert
+                  alert('There are errors in the form.') //eslint-disable-line no-alert
                 }
               })
             }
@@ -186,29 +195,25 @@ export class Registration extends React.Component {
                  />
               )}
               <Row>
-                <Col md={2}>
-                  Total count
-                </Col>
-                <Col md={2}>
-                  <Input
-                    type="number"
-                    id="totalCount"
-                    onChange={(e) => {
-                      let value = parseInt(e.target.value, 10)
-                      dispatch({
-                        fn: (s) => R.assoc('totalCount', value, s),
-                        description: `Set totalCount to ${value}`
-                      })
-                      handleEvent('change', 'totalCount')
-                    }}
-                    onBlur={(e) => handleEvent('blur', 'totalCount')}
-                    bsStyle={style(vdata.totalCount)}
-                    hasFeedback
-                    value={totalCount}
-                  />
-                </Col>
-                <Col md={8}>
-                  {validationMessage(vdata.totalCount)}
+                <Col md={6}>
+                  <FormGroup controlId="totalCount" validationState={style(vdata.totalCount)}>
+                    <ControlLabel>Total count</ControlLabel>
+                    <FormControl
+                      type="number"
+                      onChange={(e) => {
+                        let value = parseInt(e.target.value, 10)
+                        dispatch({
+                          fn: (s) => R.assoc('totalCount', value, s),
+                          description: `Set totalCount to ${value}`
+                        })
+                        handleEvent('change', 'totalCount')
+                      }}
+                      onBlur={(e) => handleEvent('blur', 'totalCount')}
+                      value={totalCount}
+                    />
+                    <FormControl.Feedback />
+                    <HelpBlock>{validationMessage(vdata.totalCount)}</HelpBlock>
+                  </FormGroup>
                 </Col>
               </Row>
               <Row>
@@ -226,3 +231,5 @@ export class Registration extends React.Component {
     )
   }
 }
+
+const ValidatedRegistration = validated(validationConfig)(Registration)

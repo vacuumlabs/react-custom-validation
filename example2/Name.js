@@ -2,7 +2,7 @@
 
 import React from 'react'
 import {validated} from '../lib/validation'
-import {Input, Row, Col, Button} from 'react-bootstrap'
+import {FormGroup, FormControl, Row, Col, Button} from 'react-bootstrap'
 import {valid, invalid} from '../lib/Rules'
 import R from 'ramda'
 import {style, validationMessage} from './helpers'
@@ -47,8 +47,7 @@ function validationConfig(props) {
   }
 }
 
-@validated(validationConfig)
-export default class Name extends React.Component {
+class Name extends React.Component {
 
   static propTypes = {
     state: React.PropTypes.object.isRequired,
@@ -71,19 +70,19 @@ export default class Name extends React.Component {
     }
 
     return (
-      <Input
-        type="text"
-        id={name}
-        placeholder={placeholder}
-        onChange={(e) => {
-          update(e.target.value)
-          handleEvent('change', name)
-        }}
-        onBlur={(e) => handleEvent('blur', name)}
-        bsStyle={style}
-        hasFeedback
-        value={this.props.state.fields[name].value}
-      />
+      <FormGroup controlId={name} validationState={style}>
+        <FormControl
+          type="text"
+          placeholder={placeholder}
+          onChange={(e) => {
+            update(e.target.value)
+            handleEvent('change', name)
+          }}
+          onBlur={(e) => handleEvent('blur', name)}
+          value={this.props.state.fields[name].value}
+        />
+        <FormControl.Feedback />
+      </FormGroup>
     )
   }
 
@@ -111,3 +110,5 @@ export default class Name extends React.Component {
     )
   }
 }
+
+export default validated(validationConfig)(Name)
