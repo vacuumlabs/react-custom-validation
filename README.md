@@ -456,3 +456,47 @@ function isUnique({value}) {
 
 To write a custom rule, you just need to implement the function and use it in
 your validation config.
+
+### Custom messages and internationalization
+
+In larger and more serious projects one might need to translate the validation
+messages to other languages, or one might want to provide very specific
+validation messages. The recommended way of achieving this is outlined below.
+
+Write rule functions that return object as a reason:
+```
+function hasLength({value, min, max}) {
+  if (min != null && value.length < min) {
+    return invalid({code: 'too short', args: {min}, msg: `Length should be at least ${min}.`}})
+  }
+  if (max != null && value.length > max) {
+    return invalid({code: 'too long', args: {max}, msg: `Length should be at most ${max}.`}})
+  }
+  return valid()
+}
+```
+
+Write a `displayMessage` function that can handle all types of reasons that you
+are using, for example:
+```
+function displayMessage(reason, dictionary) {
+  if (typeof reason === 'string') {
+    return string
+  }
+  {code, min, msg} = reason
+  if (dictionary.code != null) {
+    return dictionary.code(args)
+  } else {
+    return msg // falling back to provided message
+  }
+}
+
+```
+The dictionary in this case might be something like:
+```
+{
+  'too short': ({min}) => `The provided value is very short. Please enter at
+  least ${min} characters`,
+  ...
+}
+```
