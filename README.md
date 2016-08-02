@@ -15,16 +15,11 @@ but it can be used without Redux as well.
 
 ## Try it out
 
-For first impression check out the publicly running examples:
-- example1 (TODO link)
-- example2 (TODO link)
-
-To gain more insight it is better to run the examples locally and play with the
-code a little:
+To run the examples locally:
 - Clone the repository: `git clone git@github.com:vacuumlabs/validation.git`
--  Build the example: `gulp build-example --example=example1`
--  The directory `/path/to/validation-repo/public` will be created that includes all html and js code needed to run the example.
--  Open the file `/path/to/validation-repo/public/index.html` in your browser. You do not need to run any server.
+- Build the example: `gulp build-example1` or `gulp build-example2`
+- The directory `/path/to/validation-repo/public` will be created that includes all html and js code needed to run the example.
+- Open the file `/path/to/validation-repo/public/index.html` in your browser. You do not need to run any server.
 
 It is highly recommended to review and understand the code of both examples, as
 it can help to understand the documentation and all features of this library.

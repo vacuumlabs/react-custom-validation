@@ -1,6 +1,7 @@
 'use strict'
 
 let gulp = require('gulp')
+let runSequence = require('run-sequence')
 let browserify = require('browserify')
 let source = require('vinyl-source-stream')
 let babel = require('gulp-babel')
@@ -19,23 +20,31 @@ gulp.task('js', function() {
     .pipe(gulp.dest(BUILD_FOLDER + 'js/'))
 })
 
-gulp.task('build-dist', function() {
-  return gulp.src('lib/**/*.js')
-    .pipe(babel({stage: 0}))
-    .pipe(gulp.dest('dist'))
-})
-
 gulp.task('html', function() {
   return gulp.src('./html/index.html')
     .pipe(gulp.dest(BUILD_FOLDER))
 })
 
-gulp.task('build-example', ['js', 'html'])
+gulp.task('build-example1', (cb) => {
+  argv.example = 'example1'
+  runSequence(['js', 'html'], cb)
+})
+
+gulp.task('build-example2', (cb) => {
+  argv.example = 'example2'
+  runSequence(['js', 'html'], cb)
+})
 
 // Main task to run
 gulp.task('watch', ['build-example'], function() {
   gulp.watch(`./${argv.example}/**/*`, ['js'])
   gulp.watch('./lib/**/*', ['js'])
+})
+
+gulp.task('build-dist', function() {
+  return gulp.src('lib/**/*.js')
+    .pipe(babel({stage: 0}))
+    .pipe(gulp.dest('dist'))
 })
 
 gulp.task('eslint', () => {
