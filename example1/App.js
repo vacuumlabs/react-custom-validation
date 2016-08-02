@@ -6,11 +6,14 @@ import {
   validated,
   initValidation,
   validity,
-  IsEmail,
-  IsRequired,
-  HasNumber,
-  HasLength,
-  AreSame} from '../lib/validation'
+  isEmail,
+  isRequired,
+  hasNumber,
+  hasLength,
+  areSame,
+  valid,
+  invalid
+} from '../lib/validation'
 import {
   ControlLabel,
   FormGroup,
@@ -22,7 +25,6 @@ import {
   Panel,
   Button
 } from 'react-bootstrap'
-import {valid, invalid} from '../lib/Rules'
 import R from 'ramda'
 import {cloneDeep} from 'lodash'
 
@@ -123,23 +125,23 @@ function validationConfig(props) {
         rules: {
           // The `fn` argument associated with a given rule name has to be
           // constant (lambda functions are not allowed)
-          isRequired: {fn: IsRequired, args: {value: email}},
-          isEmail: {fn: IsEmail, args: {value: email}},
+          isRequired: {fn: isRequired, args: {value: email}},
+          isEmail: {fn: isEmail, args: {value: email}},
           isUnique: {fn: IsUnique, args: {time: 1000, value: email}}
         },
         fields: 'email', // field(s) validated by this set of rules
       },
       password: {
         rules: {
-          isRequired: {fn: IsRequired, args: {value: password}},
-          hasLength: {fn: HasLength, args: {value: password, min: 6, max: 10}},
-          hasNumber: {fn: HasNumber, args: {value: password}}
+          isRequired: {fn: isRequired, args: {value: password}},
+          hasLength: {fn: hasLength, args: {value: password, min: 6, max: 10}},
+          hasNumber: {fn: hasNumber, args: {value: password}}
         },
         fields: 'password',
       },
       passwordsMatch: {
         rules: {
-          areSame: {fn: AreSame, args: {value1: password, value2: rePassword}},
+          areSame: {fn: areSame, args: {value1: password, value2: rePassword}},
         },
         fields: ['password', 'rePassword'],
       },

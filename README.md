@@ -419,6 +419,15 @@ Returns initial status of validation data as provided by this library. Can be
 used to initialize the app state. It is recommended (but not necessary) to keep
 the validation data in the app state structured in the same way.
 
+#### `valid()`
+
+Returns valid validation result, that is `{valid: true, reason: null}`. Useful
+for writing custom rule functions.
+
+#### `invalid(reason)`
+
+Returns invalid validation result with specified reason, that is `{valid: false,
+reason: reason}`. Useful for writing custom rule functions.
 
 ## Defining Custom Rules
 

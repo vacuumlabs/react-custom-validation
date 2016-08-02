@@ -5,7 +5,9 @@ import Promise from 'bluebird'
 import {
   validated,
   initValidation,
-  validity
+  validity,
+  valid,
+  invalid
 } from '../lib/validation'
 import {
   ControlLabel,
@@ -18,7 +20,6 @@ import {
   Panel,
   Button
 } from 'react-bootstrap'
-import {valid, invalid} from '../lib/Rules'
 import R from 'ramda'
 import {cloneDeep} from 'lodash'
 import {style, validationMessage} from './helpers'

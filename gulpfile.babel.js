@@ -43,6 +43,7 @@ gulp.task('eslint', () => {
     'gulpfile.babel.js',
     'lib/**/*.js',
     'example1/**/*.js',
+    'example2/**/*.js',
   ])
   .pipe(eslint())
   .pipe(eslint.format())

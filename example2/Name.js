@@ -1,9 +1,8 @@
 'use strict'
 
 import React from 'react'
-import {validated} from '../lib/validation'
+import {validated, valid, invalid} from '../lib/validation'
 import {FormGroup, FormControl, Row, Col, Button} from 'react-bootstrap'
-import {valid, invalid} from '../lib/Rules'
 import R from 'ramda'
 import {style, validationMessage} from './helpers'
 
