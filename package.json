@@ -1,6 +1,6 @@
 {
   "name": "react-custom-validation",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Form validation with customizable rules",
   "main": "dist/validation.js",
   "dependencies": {
