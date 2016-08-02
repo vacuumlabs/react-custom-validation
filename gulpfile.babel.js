@@ -36,14 +36,14 @@ gulp.task('build-example2', (cb) => {
 })
 
 // Main task to run
-gulp.task('watch', ['build-example'], function() {
+gulp.task('watch', ['js', 'html'], function() {
   gulp.watch(`./${argv.example}/**/*`, ['js'])
   gulp.watch('./lib/**/*', ['js'])
 })
 
 gulp.task('build-dist', function() {
   return gulp.src('lib/**/*.js')
-    .pipe(babel({stage: 0}))
+    .pipe(babel({presets: ['es2015', 'react', 'stage-0']}))
     .pipe(gulp.dest('dist'))
 })
 
