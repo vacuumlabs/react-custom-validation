@@ -8,7 +8,7 @@ features include:
   - Hide validity if the field was not touched yet
   - Show the validity if the user finished typing
 - Easy definition and usage of custom validation rules
-- Flexibility: can be easily combined with other validation approaches
+- Flexibility and extensibility: can be easily combined with other validation approaches
 
 This library is intended to be used with React. It also plays well with Redux,
 but it can be used without Redux as well.
