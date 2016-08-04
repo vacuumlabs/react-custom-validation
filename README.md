@@ -1,40 +1,49 @@
 # React Validation Library
 
-Client-side validation library that aims for the excellent user experience. Don't expect cheap magic
-here; we'll force you to write some ammount of code. It's the only way how to do really great
-validations.
+Client-side validation library that aims for the excellent user experience. Do
+not expect cheap magic here; we will force you to write some ammount of code.
+It is the only way how to do really great validations.
 
 ## Rationale
 
-With React and proper application state management system (for example, Redux) it's simple to
-validate things. All the data is available in the application state so obtaining the validity is as
-easy as applying validation functions to the appropriate arguments. Multiple fields validations and
-asynchronous validations do not complicate the story much.
+With React and proper application state management system (for example, Redux)
+it is simple to validate things. All the data is available in the application
+state, hence obtaining the validity is as easy as applying validation functions
+to the appropriate arguments. Multiple-field validations and asynchronous
+validations do not complicate the story much.
 
-The real challenge for top-noch validated component is not computing actual validity of individual
-fields, but computing, whether the validation result should be showed to user. We strongly believe
-that these two aspects are completely orthogonal and should be treated so. Required field never
-touched? Invalid, but don't show it. Email field does not look e-mail-ish at all? Invalid, but
-don't show it, if user is still typing. If user changes focus to other field, show it ASAP! You see
-the picture.
+The real challenge for top-noch validated component is not computing actual
+validity of individual fields, but computing whether the validation result
+should be shown to the user. We strongly believe that these two aspects are
+completely orthogonal and should be treated so. Required field never touched?
+Invalid, but do not show it. Email field does not look e-mail-ish at all?
+Invalid, but do not show it if the user is still typing. If the user changes the
+focus to another field, show it ASAP! You see the picture.
 
-It turns out that whether the validation result should be presented to the user depends on many
-details: what inputs were already touched, when the last keystroke happened, whether user already
-attempted to submit the form.. For anything else than showing validation, such details are
-100% unimportant, so you don't capture and store such data in any way. The validation library therefore creates higher order component (HOC) that stores this information in it's internal component state. The contract is simple:
+It turns out that whether the validation result should be presented to the user
+depends on many details: what inputs were already touched, when the last
+keystroke happened, whether the user already attempted to submit the form, etc.
+Such details are 100% unimportant for anything else than showing validation
+result, so you do not capture and store these data in any way. Therefore, the
+validation library creates a higher order component (HOC) that stores this
+information in its internal component state.
 
-- you configure, what validation rules exist and what fields affects what validations
-- you inform the validation component about all changes, blurs and submits user performs
-- validation component informs you, what is the status of individual validation: Whether the
-  validation is OK / not OK and whether you should / should't display validation status.
+The contract is simple:
+
+- you configure what validation rules exist and what fields affect what validations
+- you inform the validation component about all changes, blurs and submits
+  performed by the user
+- validation component informs you what is the status of each individual
+  validation: Whether the validation is OK / not OK and whether you should /
+  should't display validation status
 
 ## Feature set
 
 - Automatic re-calculation of validity when user changes the input value
-- Suggestions on show/hide the validation result
+- Suggestions on showing/hiding the validation result
   - Hide validity while the user is typing
   - Hide validity if the field was not touched yet
-  - Show the validity if the user finished typing
+  - Show validity if the user finished typing
 - Easy definition and usage of custom validation rules
 - Multiple fields validation
 - Async validations
@@ -42,19 +51,19 @@ attempted to submit the form.. For anything else than showing validation, such d
 - Conditional validations
 - Flexibility and extensibility: can be easily combined with other validation approaches
 
-
-
 This library is intended to be used with React. It also plays well with Redux,
-but it can be used without Redux as well. It can be easily integrated with React-Intl or other
-(custom?) i18n solution.
+but it can be used without Redux as well. It can be easily integrated with
+React-Intl or other (custom?) i18n solution.
 
 ## Try it out
 
 To run the examples locally:
 - Clone the repository: `git clone git@github.com:vacuumlabs/validation.git`
 - Build the example: `gulp build-example1` or `gulp build-example2`
-- The directory `/path/to/validation-repo/public` will be created that includes all html and js code needed to run the example.
-- Open the file `/path/to/validation-repo/public/index.html` in your browser. You do not need to run any server.
+- The directory `/path/to/validation-repo/public` will be created that includes
+  all html and js code needed to run the example.
+- Open the file `/path/to/validation-repo/public/index.html` in your browser.
+  You do not need to run any server.
 
 It is highly recommended to review and understand the code of both examples, as
 it can help to understand the documentation and all features of this library.
@@ -69,13 +78,18 @@ code without validations could be as follows:
 class RegistrationForm extends React.Component {
 
   render() {
-    let {email, password, rePassword} = this.props.fields
+    let {
+      fields: {email, password, rePassword}
+      changeEmail,
+      // ...
+    } = this.props.fields
+
     return (
       <form>
         <input
           type="text"
           id="email"
-          onChange={changeEmail(e.target.value)}
+          onChange={(e) => changeEmail(e.target.value)}
           value={email}
         />
         { /* similar code for password and re-password inputs */ }
@@ -92,22 +106,40 @@ that calculate validation config from component's props:
 function validationConfig(props) {
   let {
     fields,
+    // Key-value pairs of validated fields
     fields: {email, password, rePassword},
+    // Object with validation results as returned by the validation library.
+    // For more detailed explanation of validation results see API
+    // (validationConfig/onValidation). Each result is stored as a value under
+    // the validation name; for example in this case it could look as follows:
+    // {
+    //   email: {
+    //     result: {valid: true},
+    //     show: true,
+    //   },
+    //   password: {
+    //     result: {valid: true},
+    //     show: true,
+    //   },
+    //   rePassword: {
+    //     result: {valid: false, rule: 'areSame', error: 'Values do not match'},
+    //     show: false,
+    //   },
+    // }
     validations,
-    dispatch,
-    handleValidation
+    // Function (name, data) => {...} used to handle data provided by
+    // validation library
+    onValidation,
   } = props
 
   return {
     // list of names of all relevant fields
-    fields: Object.keys(fields),
-    // whether the whole form is valid
+    fields: ['email', 'password', 'rePassword'],
+    // whether the whole form is valid; for `validity` see helper functions below
     formValid: validity(validations),
     // specify what should happen when new validation data is available
     // for example, redux action creator, that will save the validation result to the application state
-    onValidation: (name, data) => {
-      handleValidation(name, data)
-    },
+    onValidation,
     // configure the validations itself. Here we specify 3 validations, each with different
     // validation rules.
     validations: {
@@ -117,7 +149,9 @@ function validationConfig(props) {
           isEmail: {fn: isEmail, args: {value: email}},
           isUnique: {fn: isUnique, args: {time: 1000, value: email}}
         },
-        // field(s) validated by this set of rules. Important for validation-showing info.
+        // Field(s) validated by this validation. Validation library uses this
+        // to determine which fields changes, blurs and submits have to be tracked
+        // and then uses this data to calculate validation-showing info.
         fields: 'email',
       },
       password: {
@@ -345,7 +379,7 @@ longer found among `validations` in the config.
 If not provided, the following default implementation will be used:
 
 ```
-  (name) => handleValidation({result: {valid: true}, show: false})
+  (name) => onValidation({result: {valid: true}, show: false})
 ```
 
 #### `debounce` (optional)
