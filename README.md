@@ -181,8 +181,8 @@ This function provides all necessary configuration for the validation library.
 
 To make the show/hide validity recommendations work properly, one also needs to
 notify the validation library about some user actions. For this purpose,
-`fieldEvent` prop is provided to the React component which should be used for
-this purpose (see more
+`fieldEvent` and `connectField` props are provided to the React component which
+should be used for this purpose (see more
 [here](https://github.com/vacuumlabs/validation/tree/change-api#handleevent)).
 
 In return, the validation library provides one with data on validity and
@@ -464,6 +464,27 @@ Examples of usage:
     e.preventDefault()
     this.props.fieldEvent('submit')
     //...
+```
+
+#### `connectField(field, onChange, onBlur)`
+
+Synactic sugar that saves manual calling of the `fieldEvent` function. Takes in
+three arguments:
+- field name
+- `onChange` handler
+- `onBlur` handler
+Provides modified `onChange` and `onBlur` that take care of calling the
+`fieldEvent` function. Both handlers can be null, empty functions are then used
+as a default.
+
+Example of usage:
+```
+<input
+  type="text"
+  id="email"
+  {...connectField('email', (e) => this.handleEmailChange(e.target.value))}
+  value={this.props.fields.email}
+/>
 ```
 
 ### Helper Functions

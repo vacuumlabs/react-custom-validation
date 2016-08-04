@@ -157,10 +157,11 @@ class Registration extends React.Component {
     dispatch: React.PropTypes.func.isRequired,
     onFormValid: React.PropTypes.func.isRequired,
     fieldEvent: React.PropTypes.func.isRequired,
+    connectField: React.PropTypes.func.isRequired,
   }
 
   renderField(name, label, style, helpMsg) {
-    let {fieldEvent} = this.props
+    let {connectField} = this.props
 
     let update = (value) => {
       this.props.dispatch({
@@ -177,11 +178,7 @@ class Registration extends React.Component {
         <ControlLabel>{label}</ControlLabel>
         <FormControl
           type="text"
-          onChange={(e) => {
-            update(e.target.value)
-            fieldEvent('change', name)
-          }}
-          onBlur={(e) => fieldEvent('blur', name)}
+          {...connectField(name, (e) => update(e.target.value))}
           value={this.props.appState.fields[name]}
         />
         <FormControl.Feedback />
