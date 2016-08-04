@@ -156,11 +156,11 @@ class Registration extends React.Component {
     appState: React.PropTypes.object.isRequired,
     dispatch: React.PropTypes.func.isRequired,
     onFormValid: React.PropTypes.func.isRequired,
-    handleEvent: React.PropTypes.func.isRequired,
+    fieldEvent: React.PropTypes.func.isRequired,
   }
 
   renderField(name, label, style, helpMsg) {
-    let {handleEvent} = this.props
+    let {fieldEvent} = this.props
 
     let update = (value) => {
       this.props.dispatch({
@@ -179,9 +179,9 @@ class Registration extends React.Component {
           type="text"
           onChange={(e) => {
             update(e.target.value)
-            handleEvent('change', name)
+            fieldEvent('change', name)
           }}
-          onBlur={(e) => handleEvent('blur', name)}
+          onBlur={(e) => fieldEvent('blur', name)}
           value={this.props.appState.fields[name]}
         />
         <FormControl.Feedback />
@@ -198,7 +198,7 @@ class Registration extends React.Component {
         <form onSubmit={
           (e) => {
             e.preventDefault()
-            this.props.handleEvent('submit')
+            this.props.fieldEvent('submit')
             // When user clicks on the submit button, wait until validity of
             // the form is known (!= null) and only then proceed with the
             // onSubmit handler.

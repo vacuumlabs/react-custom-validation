@@ -53,11 +53,11 @@ class Name extends React.Component {
     dispatch: React.PropTypes.func.isRequired,
     remove: React.PropTypes.func.isRequired,
     onFormValid: React.PropTypes.func.isRequired,
-    handleEvent: React.PropTypes.func.isRequired,
+    fieldEvent: React.PropTypes.func.isRequired,
   }
 
   renderField(name, placeholder, style) {
-    let {handleEvent} = this.props
+    let {fieldEvent} = this.props
 
     let update = (value) => {
       this.props.dispatch({
@@ -75,9 +75,9 @@ class Name extends React.Component {
           placeholder={placeholder}
           onChange={(e) => {
             update(e.target.value)
-            handleEvent('change', name)
+            fieldEvent('change', name)
           }}
-          onBlur={(e) => handleEvent('blur', name)}
+          onBlur={(e) => fieldEvent('blur', name)}
           value={this.props.state.fields[name].value}
         />
         <FormControl.Feedback />

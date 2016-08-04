@@ -117,7 +117,7 @@ class Registration extends React.Component {
     appState: React.PropTypes.object.isRequired,
     dispatch: React.PropTypes.func.isRequired,
     onFormValid: React.PropTypes.func.isRequired,
-    handleEvent: React.PropTypes.func.isRequired,
+    fieldEvent: React.PropTypes.func.isRequired,
   }
 
   remove(id) {
@@ -153,7 +153,7 @@ class Registration extends React.Component {
         totalCount,
         validations: vdata,
       },
-      handleEvent,
+      fieldEvent,
       dispatch,
     } = this.props
 
@@ -165,9 +165,9 @@ class Registration extends React.Component {
           <form onSubmit={
             (e) => {
               e.preventDefault()
-              this.props.handleEvent('submit')
+              this.props.fieldEvent('submit')
               for (let id in names) {
-                this.nameComponents[id].handleEvent('submit')
+                this.nameComponents[id].fieldEvent('submit')
               }
               this.props.onFormValid((valid, props) => {
                 if (valid) {
@@ -207,9 +207,9 @@ class Registration extends React.Component {
                           fn: (s) => R.assoc('totalCount', value, s),
                           description: `Set totalCount to ${value}`
                         })
-                        handleEvent('change', 'totalCount')
+                        fieldEvent('change', 'totalCount')
                       }}
-                      onBlur={(e) => handleEvent('blur', 'totalCount')}
+                      onBlur={(e) => fieldEvent('blur', 'totalCount')}
                       value={totalCount}
                     />
                     <FormControl.Feedback />

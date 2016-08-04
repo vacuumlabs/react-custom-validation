@@ -181,7 +181,7 @@ This function provides all necessary configuration for the validation library.
 
 To make the show/hide validity recommendations work properly, one also needs to
 notify the validation library about some user actions. For this purpose,
-`handleEvent` prop is provided to the React component which should be used for
+`fieldEvent` prop is provided to the React component which should be used for
 this purpose (see more
 [here](https://github.com/vacuumlabs/validation/tree/change-api#handleevent)).
 
@@ -435,7 +435,7 @@ while the validation calculation is in progress), `this.props` might not be up
 to date. Field values in `props` are guaranteed to be valid and most recently
 submitted.
 
-#### `handleEvent`
+#### `fieldEvent`
 
 Handler used to notify the validation library about user actions which are used
 in show validation calculations. Takes in two arguments:
@@ -451,9 +451,9 @@ Examples of usage:
   id="email"
   onChange={(e) => {
     this.handleEmailChange(e.target.value)
-    handleEvent('change', 'email')
+    fieldEvent('change', 'email')
   }}
-  onBlur={(e) => handleEvent('blur', 'email')}
+  onBlur={(e) => fieldEvent('blur', 'email')}
   value={this.props.fields.email}
 />
 ```
@@ -462,7 +462,7 @@ Examples of usage:
 <form onSubmit={
   (e) => {
     e.preventDefault()
-    this.props.handleEvent('submit')
+    this.props.fieldEvent('submit')
     //...
 ```
 
