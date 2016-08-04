@@ -5,7 +5,7 @@ import Promise from 'bluebird'
 import {
   validated,
   initValidation,
-  validity,
+  isFormValid,
   isEmail,
   isRequired,
   hasNumber,
@@ -113,7 +113,7 @@ function validationConfig(props) {
 
   return {
     fields, // key-value pairs for all fields that require validation
-    formValid: validity(validations),
+    formValid: isFormValid(validations),
     // specify what should happen when new validation data is available
     onValidation: (name, data) => updateValidation(dispatch, name, data),
     // onDestroy is optional, default implementation will be used if not provided

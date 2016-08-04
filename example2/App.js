@@ -5,7 +5,7 @@ import Promise from 'bluebird'
 import {
   validated,
   initValidation,
-  validity,
+  isFormValid,
   valid,
   invalid
 } from '../lib/validation'
@@ -98,7 +98,7 @@ function validationConfig(props) {
 
   return {
     fields: {totalCount},
-    formValid: validity(validations),
+    formValid: isFormValid(validations),
     onValidation: (name, data) => updateValidation(dispatch, name, data),
     validations: {
       totalCount: {

@@ -135,8 +135,9 @@ function validationConfig(props) {
   return {
     // list of names of all relevant fields
     fields: ['email', 'password', 'rePassword'],
-    // whether the whole form is valid; for `validity` see helper functions below
-    formValid: validity(validations),
+    // whether the whole form is valid; for details on `isFormValid` see helper
+    // functions below
+    formValid: isFormValid(validations),
     // specify what should happen when new validation data is available
     // for example, redux action creator, that will save the validation result to the application state
     onValidation,
@@ -360,7 +361,7 @@ in the validation library for calculating overall form validity, so the usage
 should usually look as follows:
 
 ```
-  formValid: validity(props.validations)
+  formValid: isFormValid(props.validations)
 ```
 
 #### `onDestroy` (optional)
@@ -467,7 +468,7 @@ Examples of usage:
 
 ### Helper Functions
 
-#### `validity(validationData)`
+#### `isFormValid(validationData)`
 
 Returns validity of multiple validation results. The result is false if any
 single validation contains valid = false, null if any validation contains valid
