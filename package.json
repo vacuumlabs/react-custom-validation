@@ -1,9 +1,13 @@
 {
   "name": "react-custom-validation",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Form validation with customizable rules",
   "main": "dist/validation.js",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vacuumlabs/react-validation.git"
+  },
   "dependencies": {
     "bluebird": "^2.9.25",
     "immutable": "^3.7.5",
