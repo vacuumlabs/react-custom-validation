@@ -38,7 +38,7 @@ function validationConfig(props) {
     validations: {
       names: {
         rules: {
-          isConsistent: {fn: isConsistent, args: {first, last, full}},
+          isConsistent: [isConsistent, {first, last, full}],
         },
         fields: ['first', 'last', 'full']
       },

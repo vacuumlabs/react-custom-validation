@@ -28,7 +28,7 @@ import {
 import R from 'ramda'
 import {cloneDeep} from 'lodash'
 
-function IsUnique({value, time}) {
+function isUnique(value, {time}) {
   let isValid = value.indexOf('used') === -1
   let response = isValid ? valid() : invalid('The value is not unique.')
   return Promise.delay(time).then(() => response)
@@ -123,25 +123,26 @@ function validationConfig(props) {
     validations: {
       email: {
         rules: {
-          // The `fn` argument associated with a given rule name has to be
-          // constant (lambda functions are not allowed)
-          isRequired: {fn: isRequired, args: {value: email}},
-          isEmail: {fn: isEmail, args: {value: email}},
-          isUnique: {fn: IsUnique, args: {time: 1000, value: email}}
+          // Lisp-like convention, first item in the list is function, all other
+          // items are arguments. Note that the function has to be constant
+          // (lambda functions are not allowed)
+          isRequired: [isRequired, email],
+          isEmail: [isEmail, email],
+          isUnique: [isUnique, email, {time: 1000}]
         },
         fields: 'email', // field(s) validated by this set of rules
       },
       password: {
         rules: {
-          isRequired: {fn: isRequired, args: {value: password}},
-          hasLength: {fn: hasLength, args: {value: password, min: 6, max: 10}},
-          hasNumber: {fn: hasNumber, args: {value: password}}
+          isRequired: [isRequired, password],
+          hasLength: [hasLength, password, {min: 6, max: 10}],
+          hasNumber: [hasNumber, password],
         },
         fields: 'password',
       },
       passwordsMatch: {
         rules: {
-          areSame: {fn: areSame, args: {value1: password, value2: rePassword}},
+          areSame: [areSame, password, rePassword]
         },
         fields: ['password', 'rePassword'],
       },
