@@ -110,19 +110,11 @@ function validationConfig(props) {
   } = props
 
   return {
-    fields: Object.keys(fields), // list of all field names that require validation
-    // specify what should happen when new validation data is available
+    fields: Object.keys(fields),
     onValidation: (name, data) => updateValidation(dispatch, name, data),
-    // onDestroy is optional, default implementation will be used if not provided
-    // specify what should happen when validation `name` is no longer present
-    onDestroy: (name) => removeValidation(dispatch, name),
-    debounce: 100, // throttle validity computations; optional; default = 100
     validations: {
       email: {
         rules: {
-          // Lisp-like convention, first item in the list is function, all other
-          // items are arguments. Note that the function has to be constant
-          // (lambda functions are not allowed)
           isRequired: [isRequired, email],
           isEmail: [isEmail, email],
           isUnique: [isUnique, email, {time: 1000}]
@@ -196,10 +188,6 @@ class Registration extends React.Component {
             // onSubmit handler.
             this.props.onFormValid((valid, props) => {
               if (valid) {
-                // It is recommended to use props provided to the handler
-                // rather than this.props, as this.props might not be up-to
-                // date if the validation took too long. The form data in
-                // props are guaranteed to be valid.
                 let {fields: {email}} = this.props.appState
                 alert(`Registration successful! Email=${email}`) //eslint-disable-line no-alert
               }

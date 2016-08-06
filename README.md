@@ -1,7 +1,7 @@
 # React Validation Library
 
 Client-side validation library that aims for the excellent user experience. Do
-not expect cheap magic here; we will force you to write some ammount of code.
+not expect cheap magic here; we will force you to write some amount of code.
 It is the only way how to do really great validations.
 
 ## Rationale
@@ -12,7 +12,7 @@ state, hence obtaining the validity is as easy as applying validation functions
 to the appropriate arguments. Multiple-field validations and asynchronous
 validations do not complicate the story much.
 
-The real challenge for top-noch validated component is not computing actual
+The real challenge for top-notch validated component is not computing actual
 validity of individual fields, but computing whether the validation result
 should be shown to the user. We strongly believe that these two aspects are
 completely orthogonal and should be treated so. Required field never touched?
@@ -35,7 +35,7 @@ The contract is simple:
   performed by the user
 - validation component informs you what is the status of each individual
   validation: Whether the validation is OK / not OK and whether you should /
-  should't display validation status
+  should not display validation status
 
 ## Feature set
 
@@ -58,7 +58,8 @@ React-Intl or other (custom?) i18n solution.
 ## Try it out
 
 To run the examples locally:
-- Clone the repository: `git clone git@github.com:vacuumlabs/validation.git`
+- Clone the repository: `git clone git@github.com:vacuumlabs/react-validation.git`
+- `npm install`
 - Build the example: `gulp build-example1` or `gulp build-example2`
 - The directory `/path/to/validation-repo/public` will be created that includes
   all html and js code needed to run the example.
@@ -82,7 +83,7 @@ class RegistrationForm extends React.Component {
       fields: {email, password, rePassword}
       changeEmail,
       // ...
-    } = this.props.fields
+    } = this.props
 
     return (
       <form>
@@ -100,68 +101,55 @@ class RegistrationForm extends React.Component {
 ```
 
 To add some validations for this React component, we need to define a function
-that calculate validation config from component's props:
+that calculates validation config from component's props:
 
 ```javascript
 function validationConfig(props) {
   let {
     // Key-value pairs of validated fields
     fields: {email, password, rePassword},
-    // Object with validation results as returned by the validation library.
-    // For more detailed explanation of validation results see API
-    // (validationConfig/onValidation). Each result is stored as a value under
-    // the validation name; for example in this case it could look as follows:
-    // {
-    //   email: {isValid: true, error: {}, show: true},
-    //   password: {isValid: true, error: {}, show: true},
-    //   rePassword: {
-    //     isValid: false,
-    //     error: {rule: 'areSame', reason: 'Values do not match'},
-    //     show: false,
-    //   },
-    // }
-    validations,
     // Function (name, data) => {...} used to handle data provided by
     // validation library
     onValidation,
   } = props
 
   return {
-    // names of all validated form fields
+    // Names of all validated form fields
     fields: ['email', 'password', 'rePassword'],
-    // whether the whole form is valid; for details on `isFormValid` see helper
-    // functions below
-    formValid: isFormValid(validations),
-    // specify what should happen when new validation data is available
-    // for example, redux action creator, that will save the validation result to the application state
+    // Specify what should happen when new validation data is available.
+    // For example, redux action creator, that will save the validation result
+    // to the application state
     onValidation,
-    // configure the validations itself. Here we specify 3 validations, each with different
-    // validation rules.
+    // Configure the validations itself. Here we specify 3 validations, each
+    // with different validation rules
     validations: {
       email: {
         rules: {
-          isRequired: {fn: isRequired, args: {value: email}},
-          isEmail: {fn: isEmail, args: {value: email}},
-          isUnique: {fn: isUnique, args: {time: 1000, value: email}}
+          // Lisp-like convention, first item in the list is function, all other
+          // items are arguments. Note that the function has to be constant
+          // (lambda functions are not allowed)
+          isRequired: [isRequired, email],
+          isEmail: [isEmail, email],
+          isUnique: [isUnique, email, {time: 1000}]
         },
       },
       password: {
         rules: {
-          isRequired: {fn: isRequired, args: {value: password}},
-          hasLength: {fn: hasLength, args: {value: password, min: 6, max: 10}},
-          hasNumber: {fn: hasNumber, args: {value: password}}
+          isRequired: [isRequired, password],
+          hasLength: [hasLength, password, {min: 6, max: 10}],
+          hasNumber: [hasNumber, password],
         },
       },
       passwordsMatch: {
         rules: {
-          areSame: {fn: areSame, args: {value1: password, value2: rePassword}},
+          areSame: [areSame, password, rePassword]
         },
-        // Fields validated by this validation. Validation library uses this to
-        // determine which field changes, blurs and submits have to be tracked
-        // and then uses this data to calculate validation-showing info. If not
-        // provided, the validation name (i.e. the key in this object) is used.
-        // For example, ['email'] and ['password'] are used for the email and
-        // password validations above, respectively
+        // Names of fields validated by this validation. Validation library uses
+        // this to determine which field changes, blurs and submits have to be
+        // tracked and then uses this data to calculate validation-showing info.
+        // If not provided, the validation name (i.e. the key in this object) is
+        // used.  For example, ['email'] and ['password'] are used for the email
+        // and password validations above, respectively
         fields: ['password', 'rePassword'],
       },
     },
@@ -178,7 +166,9 @@ To make the show/hide validity recommendations work properly, one also needs to
 notify the validation library about some user actions. For this purpose,
 `fieldEvent` and `connectField` props are provided to the React component which
 should be used for this purpose (see more
-[here](https://github.com/vacuumlabs/validation/tree/change-api#handleevent)).
+[here](https://github.com/vacuumlabs/react-validation/tree/change-api#fieldevent)
+and
+[here](https://github.com/vacuumlabs/react-validation/tree/change-api#connectfieldfield-onchange-onblur)).
 
 In return, the validation library provides one with data on validity and
 show/hide behavior. This data is provided via `onValidation` handler. It is
@@ -223,20 +213,23 @@ config, which is a plain javascript object containing the keys specified below.
 
 #### `validations`
 
-The most important part of the config. Value is an object containing key-value
-pairs of all validations. The key serves as an identifier for the validation and
-is referred to as validation `name` throughout this documentation. Each value is
-a javascript object with the following structure:
+The most important part of the config is an object containing key-value pairs of
+all validations. The key serves as an identifier for the validation and is
+referred to as validation `name` throughout this documentation. Each value is a
+javascript object with the following structure:
 ```
 {
   rules: {
-    ruleName: { // used as an identifier for this rule
-      fn: function // see below
-      args: javascript object // arguments for `fn`
-    },
-    anotherRuleName {
+    ruleName: [ // used as an identifier for this rule
+      fn, // first item in the list is the rule function, see below
+      arg1, // first argument for `fn`
+      arg2, // second argument for `fn`
+      ...
+    ],
+    anotherRuleName: [
       //...
-    }
+    ],
+    ...
   },
   // Field(s) validated by this validation; optional.
   // Validation library uses this to determine which field changes, blurs and
@@ -247,38 +240,38 @@ a javascript object with the following structure:
 }
 ```
 
-The `fn` function is any rule function (see the specification
-[here](https://github.com/vacuumlabs/validation/tree/change-api#defining-custom-rules))
-and `args` is the single argument that is provided to this function when it is
-called (i.e. `fn(args)` is called internally).
+Each rule is defined by a list of items. The first item in the list `fn` is any
+rule function (see the specification
+[here](https://github.com/vacuumlabs/validation/tree/change-api#defining-custom-rules)).
+Other items are provided to `fn` as arguments in the specified order (i.e.
+`fn(arg1, arg2, ...)` is called internally).
 
-Note that the `fn` argument associated with a given rule name has to be constant
-(lambda functions are not allowed).
+Note that `fn` associated with a given rule name has to be constant (lambda
+functions are not allowed).
 
 Example of usage:
 ```
 validations: {
-   email: {
-     rules: {
-       isRequired: {fn: isRequired, args: {value: email}},
-       isEmail: {fn: isEmail, args: {value: email}},
-       isUnique: {fn: isUnique, args: {time: 1000, value: email}}
-     },
-   },
-   password: {
-     rules: {
-       isRequired: {fn: isRequired, args: {value: password}},
-       hasLength: {fn: hasLength, args: {value: password, min: 6, max: 10}},
-       hasNumber: {fn: hasNumber, args: {value: password}}
-     },
-   },
-   passwordsMatch: {
-     rules: {
-       areSame: {fn: areSame, args: {value1: password, value2: rePassword}},
-     },
-     fields: ['password', 'rePassword'],
-   },
- },
+  email: {
+    rules: {
+      isRequired: [isRequired, email],
+      isEmail: [isEmail, email],
+      isUnique: [isUnique, email, {time: 1000}]
+    },
+  },
+  password: {
+    rules: {
+      isRequired: [isRequired, password],
+      hasLength: [hasLength, password, {min: 6, max: 10}],
+      hasNumber: [hasNumber, password],
+    },
+  },
+  passwordsMatch: {
+    rules: {
+      areSame: [areSame, password, rePassword]
+    },
+    fields: ['password', 'rePassword'],
+  },
 ```
 
 #### `onValidation`
@@ -287,7 +280,7 @@ Handler function that is called by the validation library whenever new
 validation data is available.
 
 The validation library does not do any auto-magic. Instead, it just calculates
-the validitation results and recommendations for showing/hiding these validation
+the validation results and recommendations for showing/hiding these validation
 results and calls the `onValidation` handler when new data is available. This
 way the application developer has full control and responsibility for handling
 the calculated validation data provided by the validation library.
@@ -311,7 +304,7 @@ The `onValidation` handler takes in two arguments:
 }
 ```
 
-Note that `rule` and `reason` are not undefined only if `valid` is `false`.
+Note that `rule` and `reason` are not undefined only if `isValid` is `false`.
 
 The recommended implementation of the `onValidation` handler should simply save
 the provided data in the application state so that they can be accessed there
@@ -349,7 +342,7 @@ For convenience reasons, object with field names as keys is also accepted:
 #### `formValid` (optional)
 
 Validity of the whole form. This information is used to provide the
-`onFormValid` function.
+`onFormValid` prop.
 
 The value can be
 - `true`: all fields are valid
@@ -357,7 +350,7 @@ The value can be
 - `null`: validity is unknown (some validations are pending)
 
 There is a [helper
-function](https://github.com/vacuumlabs/validation/tree/change-api#validityvalidationdata)
+function](https://github.com/vacuumlabs/react-validation/tree/change-api#isformvalidvalidationdata)
 in the validation library for calculating overall form validity, so the usage
 should usually look as follows:
 
@@ -366,7 +359,8 @@ should usually look as follows:
 ```
 
 This field is optional; if it is not specified, `isFormValid(validations)` is
-used.
+used (`validations` being validation results internally stored by the validation
+library).
 
 #### `onDestroy` (optional)
 
@@ -394,8 +388,8 @@ value of 100 is used.
 
 ### Provided props
 
-The validated React component gets two new props (apart from all props that were
-passed to it) from the validation library.
+The validated React component gets three new props (apart from all props that
+were passed to it) from the validation library.
 
 #### `onFormValid`
 
@@ -407,8 +401,7 @@ Example of usage:
 class RegistrationForm extends React.Component {
   myOnSubmitHandler = (valid) => {
     if (valid) {
-      let {fields: {email}} = props.appState
-      alert(`Registration successful! Email=${email}`)
+      alert('Registration successful!')
     }
   }
 
@@ -444,15 +437,15 @@ Note that the validation library does not prevent multiple submits while
 `myOnSubmitHandler` is running; the submit button should be therefore disabled
 while the `myOnSubmitHandler` is running.
 
-For information form validity calculation see
-[here](https://github.com/vacuumlabs/validation/tree/change-api#formvalidity).
+For information on form validity calculation see
+[here](https://github.com/vacuumlabs/react-validation/tree/change-api#formvalid-optional).
 
 #### `fieldEvent`
 
 Handler used to notify the validation library about user actions which are used
 in show validation calculations. Takes in two arguments:
 - `type`: `'blur'` or `'change'` or `'submit'`
-- `field`: `String`, field name as reffered to in `fields` in the validation
+- `field`: `String`, field name as referred to in `fields` in the validation
   config; if not specified (usually for `'submit'` event), all fields specified in
   validation config are assumed
 
@@ -463,9 +456,9 @@ Examples of usage:
   id="email"
   onChange={(e) => {
     this.handleEmailChange(e.target.value)
-    fieldEvent('change', 'email')
+    this.props.fieldEvent('change', 'email')
   }}
-  onBlur={(e) => fieldEvent('blur', 'email')}
+  onBlur={() => this.props.fieldEvent('blur', 'email')}
   value={this.props.fields.email}
 />
 ```
@@ -480,11 +473,12 @@ Examples of usage:
 
 #### `connectField(field, onChange, onBlur)`
 
-Synactic sugar that saves manual calling of the `fieldEvent` function. Takes in
+Syntactic sugar that saves manual calling of the `fieldEvent` function. Takes in
 three arguments:
 - field name
 - `onChange` handler
 - `onBlur` handler
+
 Provides modified `onChange` and `onBlur` that take care of calling the
 `fieldEvent` function. Both handlers can be null, empty functions are then used
 as a default.
@@ -494,7 +488,7 @@ Example of usage:
 <input
   type="text"
   id="email"
-  {...connectField('email', (e) => this.handleEmailChange(e.target.value))}
+  {...this.props.connectField('email', (e) => this.handleEmailChange(e.target.value))}
   value={this.props.fields.email}
 />
 ```
@@ -532,7 +526,7 @@ rules.
 The rule function can be any function that:
 - takes in one argument
 - returns object with keys `valid` and `reason` (`reason == null` if `valid` is
-  `true`) or a Promise of such object
+  `true`) or a `Promise` of such object
 
 For example:
 
@@ -576,11 +570,11 @@ are using, for example:
 ```
 function displayMessage(reason, dictionary) {
   if (typeof reason === 'string') {
-    return string
+    return reason
   }
-  {code, min, msg} = reason
-  if (dictionary.code != null) {
-    return dictionary.code(args)
+  {code, args, msg} = reason
+  if (dictionary[code] != null) {
+    return dictionary[code](args)
   } else {
     return msg // falling back to provided message
   }
