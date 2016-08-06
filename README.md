@@ -346,7 +346,7 @@ For convenience reasons, object with field names as keys is also accepted:
   }
 ```
 
-#### `formValid`
+#### `formValid` (optional)
 
 Validity of the whole form. This information is used to provide the
 `onFormValid` function.
@@ -364,6 +364,9 @@ should usually look as follows:
 ```
   formValid: isFormValid(props.validations)
 ```
+
+This field is optional; if it is not specified, `isFormValid(validations)` is
+used.
 
 #### `onDestroy` (optional)
 
@@ -402,7 +405,7 @@ argument, a function that specifies what should happen based on form validity.
 Example of usage:
 ```
 class RegistrationForm extends React.Component {
-  myOnSubmitHandler = (valid, props) => {
+  myOnSubmitHandler = (valid) => {
     if (valid) {
       let {fields: {email}} = props.appState
       alert(`Registration successful! Email=${email}`)
@@ -421,20 +424,28 @@ class RegistrationForm extends React.Component {
   }
 }
 ```
-It is recommended to keep the submit button always enabled and use the
-`onFormValid` handler to avoid invalid data submission. When user clicks on the
-submit button, the `onFormValid` handler is called, which calls the provided
-`myOnSubmitHandler` right away if the form validity is known already.
-Otherwise, it waits and calls the `myOnSubmitHandler` once the validity
-calculation is finished. The validity of the form is provided as an argument
-`valid` to `myOnSubmitHandler`.
+It is recommended to keep the submit button enabled while the user is filling
+out the form. Invalid data submission can be easily avoided by using the
+provided `onFormValid` function in the following way. When the user clicks on
+the submit button, the `onFormValid` function should be called with some
+`myOnSubmitHandler` as an argument. The `onFormValid` function internally waits
+until the validity calculation for the form is finished and then calls the
+`myOnSubmitHandler`, providing the form validity as an argument. If the validity
+of the form is known already when user clicks on the submit button,
+`myOnSubmitHandler` is called right away.
 
-Note that the `myOnSubmitHandler` takes also a second argument `props`. One
-should always use provided `props` (as opposed to `this.props`) from within the
-`myOnSubmitHandler`. If the user continues typing after submitting the form (and
-while the validation calculation is in progress), `this.props` might not be up
-to date. Field values in `props` are guaranteed to be valid and most recently
-submitted.
+If the user submits the form while validity calculation is in progress and the
+user continues typing (and thus changing the form field values), the
+`myOnSubmitHandler` call will be canceled. It will also be canceled if anything
+in `validations` part of the validation config changes. This is to prevent
+possible mismatch between validated and actually submitted fields.
+
+Note that the validation library does not prevent multiple submits while
+`myOnSubmitHandler` is running; the submit button should be therefore disabled
+while the `myOnSubmitHandler` is running.
+
+For information form validity calculation see
+[here](https://github.com/vacuumlabs/validation/tree/change-api#formvalidity).
 
 #### `fieldEvent`
 

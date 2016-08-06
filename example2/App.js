@@ -168,7 +168,7 @@ class Registration extends React.Component {
               for (let id in names) {
                 this.nameComponents[id].fieldEvent('submit')
               }
-              this.props.onFormValid((valid, props) => {
+              this.props.onFormValid((valid) => {
                 if (valid) {
                   alert('Registration successful!') //eslint-disable-line no-alert
                 } else {

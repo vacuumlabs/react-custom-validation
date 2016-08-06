@@ -5,7 +5,6 @@ import Promise from 'bluebird'
 import {
   validated,
   initValidation,
-  isFormValid,
   isEmail,
   isRequired,
   hasNumber,
@@ -106,14 +105,12 @@ function validationConfig(props) {
     appState: {
       fields,
       fields: {email, password, rePassword},
-      validations,
     },
     dispatch
   } = props
 
   return {
     fields: Object.keys(fields), // list of all field names that require validation
-    formValid: isFormValid(validations),
     // specify what should happen when new validation data is available
     onValidation: (name, data) => updateValidation(dispatch, name, data),
     // onDestroy is optional, default implementation will be used if not provided
@@ -203,7 +200,7 @@ class Registration extends React.Component {
                 // rather than this.props, as this.props might not be up-to
                 // date if the validation took too long. The form data in
                 // props are guaranteed to be valid.
-                let {fields: {email}} = props.appState
+                let {fields: {email}} = this.props.appState
                 alert(`Registration successful! Email=${email}`) //eslint-disable-line no-alert
               }
             })
