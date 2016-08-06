@@ -113,16 +113,11 @@ function validationConfig(props) {
     // (validationConfig/onValidation). Each result is stored as a value under
     // the validation name; for example in this case it could look as follows:
     // {
-    //   email: {
-    //     result: {valid: true},
-    //     show: true,
-    //   },
-    //   password: {
-    //     result: {valid: true},
-    //     show: true,
-    //   },
+    //   email: {isValid: true, error: {}, show: true},
+    //   password: {isValid: true, error: {}, show: true},
     //   rePassword: {
-    //     result: {valid: false, rule: 'areSame', error: 'Values do not match'},
+    //     isValid: false,
+    //     error: {rule: 'areSame', reason: 'Values do not match'},
     //     show: false,
     //   },
     // }
@@ -195,14 +190,14 @@ example:
 render() {
   // validation data were saved to app state and are available here
   let {
-    email: {result: {valid: emailValid, error: emailError, rule: emailRule}, show: emailShow}
+    email: {isValid: emailValid, error: {rule: emailRule, reason: emailReason}, show: emailShow}
     ...
   } = this.props.validations
 
   return (
     <div>
       ...
-        {emailShow ? `Invalid email (${emailError})` : 'Valid email!'}
+        {emailShow ? `Invalid email (${emailReason})` : 'Valid email!'}
       ...
     </div>
   )
@@ -300,22 +295,20 @@ The `onValidation` handler takes in two arguments:
 
 ```
 {
-  result: {
-    // valid or invalid or unknown validity
-    valid: true | false | null
+  // valid or invalid or unknown validity
+  isValid: true | false | null
+  error: {
     // name of the rule that failed
     rule: null | String
     // data returned by the rule function providing more specific info on error
-    error: null | any javascipt object
+    reason: null | any javascipt object
   },
   // whether the validation result should be displayed to the user
   show: true | false
 }
 ```
 
-Both `result` and `show` can be undefined, meaning that their values have not
-changed since the last call of `onValidation` handler. Note that `rule` and
-`error` are not null only if `valid` is `false`.
+Note that `rule` and `reason` are not undefined only if `valid` is `false`.
 
 The recommended implementation of the `onValidation` handler should simply save
 the provided data in the application state so that they can be accessed there
@@ -325,7 +318,7 @@ onValidation: (name, data) => dispatch(
   // We dispatch a function that defines how app state should be modified
   fn: (state) => {
     // create new state with updated validation data, while keeping the old state the same
-    return ramda.assocPath(['validations', name], {...state.validations[name], ...data}, state)
+    return ramda.assocPath(['validations', name], data, state)
   },
   description: `Got data for ${name} validation: ${JSON.stringify(data)}`
 )

@@ -35,19 +35,19 @@ function isUnique(value, {time}) {
 }
 
 function style(validationData) {
-  let {result: {valid}, show} = validationData
-  if (show && valid === true) return 'success'
-  if (show && valid === false) return 'error'
+  let {isValid, show} = validationData
+  if (show && isValid === true) return 'success'
+  if (show && isValid === false) return 'error'
   return null
 }
 
 function validationMessage(validationData) {
-  let {result: {valid, error, rule}, show} = validationData
+  let {isValid, error: {rule, reason}, show} = validationData
   let message = {
     null: 'Validating...',
     true: 'Valid!',
-    false: `Invalid (rule: ${rule}, error: ${error})`
-  }[valid]
+    false: `Invalid (rule: ${rule}, error: ${reason})`
+  }[isValid]
 
   return show ? message : null
 }
@@ -87,7 +87,7 @@ function updateValidation(dispatch, name, data) {
   dispatch({
     fn: (state) => {
       // create new state with updated validation data, while keeping the old state the same
-      return R.assocPath(['validations', name], {...state.validations[name], ...data}, state)
+      return R.assocPath(['validations', name], data, state)
     },
     description: `Got data for ${name} validation: ${JSON.stringify(data)}`
   })
