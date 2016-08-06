@@ -1,5 +1,8 @@
 {
   "parser": "babel-eslint",
+  "settings": {
+    "import/parser": "babel-eslint",
+  },
   "rules": {
     "brace-style": [2, "1tbs", {"allowSingleLine": true}],
     "camelcase": 1,
@@ -62,17 +65,19 @@
     "no-undefined": 0,
     "no-undef-init": 1,
     "no-underscore-dangle": 0,
+    "no-unexpected-multiline": 2,
     "no-unreachable": 2,
     "no-use-before-define": [1, "nofunc"],
     "no-var": 2,
     "no-warning-comments": [0, {"terms": ["todo", "fixme"]}],
     "no-extra-parens": 0,
+    "max-len": [1, 115, 2],
     "quotes": [1, "single", "avoid-escape"],
     "quote-props": [0, "as-needed"],
     "radix": 1,
     "semi": [1, "never"],
     "semi-spacing": [1, {"before": false, "after": true}],
-    "space-after-keywords": [1, "always"],
+    "keyword-spacing": [1, {"before": true, "after": true}],
     "space-before-blocks": [1, "always"],
     "space-before-function-paren": [1, "never"],
     "space-infix-ops": 1,
@@ -80,7 +85,6 @@
     "array-bracket-spacing": [1, "never"],
     "computed-property-spacing": [1, "never"],
     "space-in-parens": [1, "never"],
-    "space-return-throw-case": 1,
     "space-unary-ops": [1, {"words": true, "nonwords": false}],
     "strict": [0, "never"],
     "use-isnan": 1,
@@ -95,10 +99,9 @@
     "no-path-concat": 1,
     // React
     // Not needed. "react/display-name": 1,
-    "react/jsx-boolean-value": 1,
+    "react/jsx-boolean-value": 0,
     "react/jsx-quotes": 0,
     "jsx-quotes": [1, "prefer-double"],
-    "jsx-quotes": 0,
     "react/jsx-no-undef": 2,
     "react/jsx-sort-props": 0,
     "react/jsx-sort-prop-types": 0,
@@ -108,25 +111,27 @@
     "react/no-did-update-set-state": 1,
     "react/no-multi-comp": 0,
     "react/no-unknown-property": 2,
-    "react/prop-types": 1,
+    "react/prop-types": 0,
     "react/react-in-jsx-scope": 2,
     "react/self-closing-comp": 1,
     // Not ready yet. "react/sort-comp": 1,
-    "react/wrap-multilines": 1,
-    "react/jsx-boolean-value": 0,
-    "max-len": [1, 100, 2]
+    "react/jsx-wrap-multilines": 1,
+    "import/no-unresolved": [2, {"commonjs": true, "amd": true}],
+    "import/named": 2,
+    "import/namespace": 2,
+    "import/default": 0,
+    "import/export": 2,
   },
   "plugins": [
-    "react"
+    "react",
+    "import"
   ],
   "env": {
-    "es6": true,
     "browser": true,
+    "es6": true,
     "node": true
   },
   "ecmaFeatures": {
-    "jsx": true,
-    "modules": true,
-    "classes": true,
+    "jsx": true
   }
 }

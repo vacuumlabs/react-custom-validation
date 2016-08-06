@@ -1,6 +1,6 @@
 {
   "name": "react-custom-validation",
-  "version": "0.2.5",
+  "version": "0.3.0",
   "description": "Form validation with customizable rules",
   "main": "dist/validation.js",
   "license": "MIT",
@@ -9,33 +9,39 @@
     "url": "https://github.com/vacuumlabs/react-validation.git"
   },
   "dependencies": {
-    "bluebird": "^2.9.25",
-    "immutable": "^3.7.5",
-    "rx": "^3.0.0",
-    "validator": "^4.0.3"
+    "bluebird": "^3.4.1",
+    "lodash": "^4.14.1",
+    "rx": "^4.1.0",
+    "validator": "^5.5.0"
   },
   "peerDependencies": {
-    "react": ">=0.14.0 <0.15.0",
-    "react-dom": ">=0.14.0 <0.15.0"
+    "react": ">=15.0.0 <16.0.0",
+    "react-dom": ">=15.0.0 <16.0.0"
   },
   "devDependencies": {
-    "babel": "^5.4.7",
-    "babel-core": "^5.8.12",
-    "babel-eslint": "^3.0.1",
-    "babelify": "^6.1.3",
-    "browserify": "^8.1.1",
-    "eslint": "^0.23.0",
-    "eslint-plugin-react": "^2.5.2",
-    "gulp": "^3.8.11",
-    "gulp-babel": "^5.1.0",
-    "gulp-eslint": "^1.0.0",
-    "gulp-nodemon": "^1.0.5",
-    "gulp-sourcemaps": "^1.5.2",
-    "reactify": "^1.0.0",
-    "react": "^0.14.1",
-    "react-bootstrap": "^0.27.3",
-    "react-dom": "^0.14.1",
-    "yargs": "^3.18.0",
-    "vinyl-source-stream": "^1.0.0"
+    "babel": "^6.5.2",
+    "babel-core": "^6.11.4",
+    "babel-eslint": "^6.1.2",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-react": "^6.11.1",
+    "babel-preset-stage-0": "^6.5.0",
+    "babelify": "^7.3.0",
+    "browserify": "^13.1.0",
+    "eslint": "^3.2.2",
+    "eslint-plugin-import": "^1.12.0",
+    "eslint-plugin-react": "^6.0.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-eslint": "^3.0.1",
+    "gulp-nodemon": "^2.1.0",
+    "gulp-sourcemaps": "^1.6.0",
+    "ramda": "^0.21.0",
+    "react": "^15.3.0",
+    "react-bootstrap": "^0.30.1",
+    "react-dom": "^15.3.0",
+    "reactify": "^1.1.1",
+    "run-sequence": "^1.2.2",
+    "vinyl-source-stream": "^1.1.0",
+    "yargs": "^4.8.1"
   }
 }
