@@ -105,7 +105,6 @@ function validationConfig(props) {
         rules: {
           isTotalCountCorrect: [isTotalCountCorrect, {totalCount, count}],
         },
-        fields: 'totalCount', // field(s) validated by this set of rules
       },
     },
   }

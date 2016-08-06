@@ -130,7 +130,6 @@ function validationConfig(props) {
           isEmail: [isEmail, email],
           isUnique: [isUnique, email, {time: 1000}]
         },
-        fields: 'email', // field(s) validated by this set of rules
       },
       password: {
         rules: {
@@ -138,7 +137,6 @@ function validationConfig(props) {
           hasLength: [hasLength, password, {min: 6, max: 10}],
           hasNumber: [hasNumber, password],
         },
-        fields: 'password',
       },
       passwordsMatch: {
         rules: {

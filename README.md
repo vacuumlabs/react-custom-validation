@@ -145,10 +145,6 @@ function validationConfig(props) {
           isEmail: {fn: isEmail, args: {value: email}},
           isUnique: {fn: isUnique, args: {time: 1000, value: email}}
         },
-        // Field(s) validated by this validation. Validation library uses this
-        // to determine which fields changes, blurs and submits have to be tracked
-        // and then uses this data to calculate validation-showing info.
-        fields: 'email',
       },
       password: {
         rules: {
@@ -156,12 +152,17 @@ function validationConfig(props) {
           hasLength: {fn: hasLength, args: {value: password, min: 6, max: 10}},
           hasNumber: {fn: hasNumber, args: {value: password}}
         },
-        fields: 'password',
       },
       passwordsMatch: {
         rules: {
           areSame: {fn: areSame, args: {value1: password, value2: rePassword}},
         },
+        // Fields validated by this validation. Validation library uses this to
+        // determine which field changes, blurs and submits have to be tracked
+        // and then uses this data to calculate validation-showing info. If not
+        // provided, the validation name (i.e. the key in this object) is used.
+        // For example, ['email'] and ['password'] are used for the email and
+        // password validations above, respectively
         fields: ['password', 'rePassword'],
       },
     },
@@ -238,7 +239,12 @@ a javascript object with the following structure:
       //...
     }
   },
-  fields: String | Array(Strings), // field(s) validated by this set of rules
+  // Field(s) validated by this validation; optional.
+  // Validation library uses this to determine which field changes, blurs and
+  // submits have to be tracked and then uses this data to calculate
+  // validation-showing info. If not provided, the validation name (i.e. the key
+  // in this object) is used.
+  fields: String | Array(Strings),
 }
 ```
 
@@ -259,7 +265,6 @@ validations: {
        isEmail: {fn: isEmail, args: {value: email}},
        isUnique: {fn: isUnique, args: {time: 1000, value: email}}
      },
-     fields: 'email',
    },
    password: {
      rules: {
@@ -267,7 +272,6 @@ validations: {
        hasLength: {fn: hasLength, args: {value: password, min: 6, max: 10}},
        hasNumber: {fn: hasNumber, args: {value: password}}
      },
-     fields: 'password',
    },
    passwordsMatch: {
      rules: {
