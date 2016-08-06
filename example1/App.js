@@ -112,7 +112,7 @@ function validationConfig(props) {
   } = props
 
   return {
-    fields, // key-value pairs for all fields that require validation
+    fields: Object.keys(fields), // list of all field names that require validation
     formValid: isFormValid(validations),
     // specify what should happen when new validation data is available
     onValidation: (name, data) => updateValidation(dispatch, name, data),

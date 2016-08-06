@@ -105,7 +105,6 @@ that calculate validation config from component's props:
 ```javascript
 function validationConfig(props) {
   let {
-    fields,
     // Key-value pairs of validated fields
     fields: {email, password, rePassword},
     // Object with validation results as returned by the validation library.
@@ -128,7 +127,7 @@ function validationConfig(props) {
   } = props
 
   return {
-    // list of names of all relevant fields
+    // names of all validated form fields
     fields: ['email', 'password', 'rePassword'],
     // whether the whole form is valid; for details on `isFormValid` see helper
     // functions below
@@ -330,9 +329,14 @@ onValidation: (name, data) => dispatch(
 
 #### `fields`
 
-Key-value pairs of all form fields that require validation. Object keys should
-be field names and object values should be the respective field values currently
-entered in the form. Example:
+List of all field names that require validation, for example:
+
+```
+  fields: ['email', 'password', 'rePassword']
+```
+
+
+For convenience reasons, object with field names as keys is also accepted:
 
 ```
   fields: {
