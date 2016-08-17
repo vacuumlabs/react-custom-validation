@@ -12,7 +12,7 @@ import {
   areSame,
   valid,
   invalid
-} from '../lib/validation'
+} from '../lib'
 import {
   ControlLabel,
   FormGroup,
