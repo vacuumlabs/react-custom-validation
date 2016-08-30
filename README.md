@@ -425,10 +425,19 @@ For information on form validity calculation see
 
 Handler used to notify the validation library about user actions which are used
 in show validation calculations. Takes in two arguments:
-- `type`: `'blur'` or `'change'` or `'submit'`
+- `type`: `'blur'` or `'change'` or `'submit'` or `'reset'`
 - `field`: `String`, field name as referred to in `fields` in the validation
-  config; if not specified (usually for `'submit'` event), all fields specified in
-  validation config are assumed
+  config; if not specified (usually for `'submit'` and `'reset`' events), all
+  fields specified in validation config are assumed
+
+The action type `'reset'` causes the validation library to "forget" all past
+field events. For example, suppose that the field `'email'` was changed, blurred
+and/or submitted and the user is not typing right now. One will thus get `{show:
+true}` for this email validation. After `fieldEvent('reset', 'email')` is
+called, the email field will be considered untouched (all changes, blurs,
+submits being forgotten) and one will get `{show: false}` for the email
+validation. The most usual case is perhaps calling `fieldEvent('reset')` which
+is useful for resetting the whole form after successful submit.
 
 Examples of usage:
 ```
