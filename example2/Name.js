@@ -35,6 +35,7 @@ function validationConfig(props) {
   return {
     fields,
     onValidation: (name, data) => updateValidation(dispatch, name, data),
+    onDestroy: (name) => {},
     validations: {
       names: {
         rules: {
