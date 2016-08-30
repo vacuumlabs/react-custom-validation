@@ -79,7 +79,7 @@ class Name extends React.Component {
             fieldEvent('change', name)
           }}
           onBlur={(e) => fieldEvent('blur', name)}
-          value={this.props.state.fields[name].value}
+          value={this.props.state.fields[name]}
         />
         <FormControl.Feedback />
       </FormGroup>
