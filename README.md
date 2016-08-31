@@ -66,8 +66,15 @@ To run the examples locally:
 - Open the file `/path/to/validation-repo/public/index.html` in your browser.
   You do not need to run any server.
 
-It is highly recommended to review and understand the code of both examples, as
-it can help to understand the documentation and all features of this library.
+Example 1 illustrates the usage of this library in a very simple case. It is
+highly recommended to review and understand the code of example 1, as it can
+help to understand this documentation and basic features of this library.
+
+Example 2 is more complicated and is used to show that this library can be used
+even when the requirements are more complex (e.g. dynamically adding and
+removing fields, using validated sub-forms, etc.). The user is encouraged to
+review the code of example 2 if they want to create more complex validated
+forms.
 
 ## Basic Usage
 
