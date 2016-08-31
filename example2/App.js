@@ -42,22 +42,24 @@ function initNames() {
   }
 }
 
+const initialState = {
+  names: {
+    id1: initNames()
+  },
+  totalCount: 1,
+  lastId: 1,
+  validations: {
+    totalCount: initValidation(),
+  }
+}
+
 // Wrapper providing poor man's redux
 export class App extends React.Component {
 
   constructor(props) {
     super(props)
     this.state = {
-      appState: {
-        names: {
-          id1: initNames()
-        },
-        totalCount: 1,
-        lastId: 1,
-        validations: {
-          totalCount: initValidation(),
-        }
-      }
+      appState: initialState
     }
   }
 
@@ -119,6 +121,13 @@ class Registration extends React.Component {
     fieldEvent: React.PropTypes.func.isRequired,
   }
 
+  reset() {
+    this.props.dispatch({
+      fn: (state) => initialState,
+      description: 'Reset form'
+    })
+  }
+
   remove(id) {
     this.props.dispatch({
       fn: (state) => R.dissocPath(['names', id], state),
@@ -171,6 +180,11 @@ class Registration extends React.Component {
               this.props.onFormValid((valid) => {
                 if (valid) {
                   alert('Registration successful!') //eslint-disable-line no-alert
+                  for (let id in names) {
+                    this.nameComponents[id].fieldEvent('reset')
+                  }
+                  this.props.fieldEvent('reset')
+                  this.reset()
                 } else {
                   alert('There are errors in the form.') //eslint-disable-line no-alert
                 }

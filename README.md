@@ -66,8 +66,15 @@ To run the examples locally:
 - Open the file `/path/to/validation-repo/public/index.html` in your browser.
   You do not need to run any server.
 
-It is highly recommended to review and understand the code of both examples, as
-it can help to understand the documentation and all features of this library.
+Example 1 illustrates the usage of this library in a very simple case. It is
+highly recommended to review and understand the code of example 1, as it can
+help to understand this documentation and basic features of this library.
+
+Example 2 is more complicated and is used to show that this library can be used
+even when the requirements are more complex (e.g. dynamically adding and
+removing fields, using validated sub-forms, etc.). The user is encouraged to
+review the code of example 2 if they want to create more complex validated
+forms.
 
 ## Basic Usage
 
@@ -425,10 +432,19 @@ For information on form validity calculation see
 
 Handler used to notify the validation library about user actions which are used
 in show validation calculations. Takes in two arguments:
-- `type`: `'blur'` or `'change'` or `'submit'`
+- `type`: `'blur'` or `'change'` or `'submit'` or `'reset'`
 - `field`: `String`, field name as referred to in `fields` in the validation
-  config; if not specified (usually for `'submit'` event), all fields specified in
-  validation config are assumed
+  config; if not specified (usually for `'submit'` and `'reset`' events), all
+  fields specified in validation config are assumed
+
+The action type `'reset'` causes the validation library to "forget" all past
+field events. For example, suppose that the field `'email'` was changed, blurred
+and/or submitted and the user is not typing right now. One will thus get `{show:
+true}` for this email validation. After `fieldEvent('reset', 'email')` is
+called, the email field will be considered untouched (all changes, blurs,
+submits being forgotten) and one will get `{show: false}` for the email
+validation. The most usual case is perhaps calling `fieldEvent('reset')` which
+is useful for resetting the whole form after successful submit.
 
 Examples of usage:
 ```
