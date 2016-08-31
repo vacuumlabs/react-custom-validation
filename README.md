@@ -362,25 +362,6 @@ This field is optional; if it is not specified, `isFormValid(validations)` is
 used (`validations` being validation results internally stored by the validation
 library).
 
-#### `onDestroy` (optional)
-
-Function that takes in one argument:
-- `name`: name of the validation as defined in `validations` object
-
-The validation config is dynamically calculated from `props`, so the list of all
-validations can change over time. To avoid memory leaks and weird unexpected
-behavior, it is necessary to handle removal of validations that are removed from
-the config.
-
-The `onDestroy` handler is called when a validation with specified `name` is no
-longer found among `validations` in the config.
-
-If not provided, the following default implementation will be used:
-
-```
-  (name) => onValidation({result: {valid: true}, show: false})
-```
-
 #### `debounce` (optional)
 
 Throttling for validity computations, in milliseconds. If not specified, default

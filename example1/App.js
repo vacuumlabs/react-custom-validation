@@ -92,14 +92,6 @@ function updateValidation(dispatch, name, data) {
   })
 }
 
-function removeValidation(dispatch, name) {
-  dispatch({
-    // remove validation data with given name
-    fn: (state) => R.dissocPath(['validations', name], state),
-    description: `Remove validation ${name}`
-  })
-}
-
 function validationConfig(props) {
   let {
     appState: {
