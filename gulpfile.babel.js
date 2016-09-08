@@ -6,6 +6,7 @@ let browserify = require('browserify')
 let source = require('vinyl-source-stream')
 let babel = require('gulp-babel')
 let eslint = require('gulp-eslint')
+let del = require('del')
 
 let BUILD_FOLDER = './public/'
 let argv = require('yargs').alias('e', 'example').default('e', 'example1').argv
@@ -41,7 +42,11 @@ gulp.task('watch', ['js', 'html'], function() {
   gulp.watch('./lib/**/*', ['js'])
 })
 
-gulp.task('build-dist', function() {
+gulp.task('clean', function() {
+  return del(['dist/**/*'])
+})
+
+gulp.task('build-dist', ['clean'], function() {
   return gulp.src('lib/**/*.js')
     .pipe(babel({presets: ['es2015', 'react', 'stage-0']}))
     .pipe(gulp.dest('dist'))
