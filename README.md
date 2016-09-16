@@ -374,6 +374,14 @@ library).
 Throttling for validity computations, in milliseconds. If not specified, default
 value of 100 is used.
 
+#### `typingDebounce` (optional)
+
+Time to wait after last user's type before validation is shown, in milliseconds.
+If not specified, default value of 1000 is used.
+
+Note that setting this option to infinite (very long) time will result in the
+validation results being shown only on blur or submit.
+
 ### Provided props
 
 The validated React component gets three new props (apart from all props that
