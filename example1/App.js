@@ -178,7 +178,7 @@ class Registration extends React.Component {
             // When user clicks on the submit button, wait until validity of
             // the form is known (!= null) and only then proceed with the
             // onSubmit handler.
-            this.props.onFormValid((valid, props) => {
+            this.props.onFormValid((valid) => {
               if (valid) {
                 let {fields: {email}} = this.props.appState
                 alert(`Registration successful! Email=${email}`) //eslint-disable-line no-alert
