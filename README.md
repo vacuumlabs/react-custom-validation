@@ -515,13 +515,13 @@ the validation data in the app state structured in the same way.
 
 #### `valid()`
 
-Returns valid validation result, that is `{valid: true, reason: null}`. Useful
+Returns valid validation result, that is `{isValid: true, reason: null}`. Useful
 for writing custom rule functions.
 
 #### `invalid(reason)`
 
-Returns invalid validation result with specified reason, that is `{valid: false,
-reason: reason}`. Useful for writing custom rule functions.
+Returns invalid validation result with specified reason, that is `{isValid:
+false, reason: reason}`. Useful for writing custom rule functions.
 
 ## Defining Custom Rules
 
@@ -537,13 +537,13 @@ For example:
 
 ```javascript
 function areSame({value1, value2}) {
-  if (value1 === value2) return {valid: true}
-  else return {valid: false, reason: 'Values are different'}
+  if (value1 === value2) return {isValid: true}
+  else return {isValid: false, reason: 'Values are different'}
 }
 
 function isUnique({value}) {
   let isValid = value.indexOf('used') === -1
-  let response = isValid ? {valid: true} : {valid: valse, reason: 'The value is not unique.'}
+  let response = isValid ? {isValid: true} : {isValid: false, reason: 'The value is not unique.'}
   return Promise.delay(10).then(() => response)
 }
 ```
