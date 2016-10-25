@@ -36,6 +36,11 @@ gulp.task('build-example2', (cb) => {
   runSequence(['js', 'html'], cb)
 })
 
+gulp.task('build-example3', (cb) => {
+  argv.example = 'example3'
+  runSequence(['js', 'html'], cb)
+})
+
 // Main task to run
 gulp.task('watch', ['js', 'html'], function() {
   gulp.watch(`./${argv.example}/**/*`, ['js'])
@@ -58,6 +63,7 @@ gulp.task('eslint', () => {
     'lib/**/*.js',
     'example1/**/*.js',
     'example2/**/*.js',
+    'example3/**/*.js',
   ])
   .pipe(eslint())
   .pipe(eslint.format())
