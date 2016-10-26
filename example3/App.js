@@ -7,14 +7,12 @@ import {
   invalid,
   validated,
   initValidation,
+  isRequired,
 } from '../lib'
 import {
   FormGroup,
   FormControl,
   ControlLabel,
-  Grid,
-  Row,
-  Col,
   Panel,
   Button
 } from 'react-bootstrap'
@@ -29,14 +27,15 @@ export function style(validationData) {
 }
 
 export function validationMessage(validationData) {
-  let {isValid, show} = validationData
-  let message = {
-    null: 'Computing...',
-    true: 'Correct!',
-    false: 'Wrong!'
-  }[isValid]
+  let {isValid, show, error: {rule = ''}} = validationData
 
-  return show ? message : null
+  if (!show) return null
+  if (isValid == null) return 'Computing...'
+  if (isValid === true) return 'Correct!'
+
+  if (rule.startsWith('isRequired')) return 'All fields are required!'
+  if (rule.startsWith('isNumber')) return 'All fields have to be numbers!'
+  return 'Wrong result!'
 }
 
 const add = (a, b) => a + b
@@ -61,9 +60,14 @@ const initialState = {
 }
 
 function isResultCorrect(number1, number2, result, operation) {
+  let i = (n) => parseInt(n, 10)
   return Promise.delay(1000).then(() =>
-    operation(number1, number2) === result ? valid() : invalid('wrong')
+    operation(i(number1), i(number2)) === i(result) ? valid() : invalid('wrong')
   )
+}
+
+function isNumber(value) {
+  return isNaN(value) ? invalid('NaN') : valid()
 }
 
 // Wrapper providing poor man's redux
@@ -112,6 +116,12 @@ function validationConfig(props) {
     let _fields = [`${id}-number1`, `${id}-number2`, `${id}-result`]
     validations[id] = {
       rules: {
+        isRequired1: [isRequired, number1],
+        isRequired2: [isRequired, number2],
+        isRequiredResult: [isRequired, result],
+        isNumber1: [isNumber, number1],
+        isNumber2: [isNumber, number2],
+        isNumberResult: [isNumber, result],
         isResultCorrect: [isResultCorrect, number1, number2, result, OPERATIONS[operation]]
       },
       fields: _fields
@@ -191,10 +201,10 @@ class MathProblems extends React.Component {
     return (
       <FormGroup controlId={name} validationState={_style}>
         <FormControl
-          type="number"
+          type="text"
           placeholder={placeholder}
           onChange={(e) => {
-            this.dispatchValue(id, name, parseInt(e.target.value, 10))
+            this.dispatchValue(id, name, e.target.value)
             fieldEvent('change', field)
           }}
           onBlur={(e) => fieldEvent('blur', field)}
@@ -241,6 +251,7 @@ class MathProblems extends React.Component {
                     <FormControl
                       componentClass="select"
                       placeholder="select"
+                      value={operation}
                       onChange={(e) => this.dispatchOperation(e.target.value)}
                     >
                       <option value="add">Addition</option>
@@ -249,20 +260,30 @@ class MathProblems extends React.Component {
                     </FormControl>
                   </FormGroup>
               {problemIds.map((id) =>
-                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'stretch'}}>
+                <div key={id} style={
+                  {display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'stretch'}
+                }>
                   {this.renderField(id, 'number1', '')}
                   <Button style={{height: '35px', margin: '0 10px'}}> {SYMBOLS[operation]} </Button>
                   {this.renderField(id, 'number2', '')}
                 <Button style={{height: '35px', margin: '0 10px'}}> = </Button>
                   {this.renderField(id, 'result', 'Result')}
-                  <Button style={{height: '35px', margin: '0 10px'}} onClick={() => this.props.remove(id)}> X </Button>
-                  <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', height: '35px'}}>
+                  <Button style={{height: '35px', margin: '0 10px'}} onClick={() => this.remove(id)}> X </Button>
+                  <div style={
+                    {display: 'flex', alignItems: 'center', justifyContent:
+                      'center', textAlign: 'center', height: '35px'}
+                  }>
                     {validationMessage(validations[id])}
                   </div>
                 </div>
               )}
-                <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', height: '35px'}}>
-                  <Button style={{marginRight: '20px'}} bsStyle="success" onClick={() => this.add()}> Add another </Button>
+                <div style={
+                  {display: 'flex', flexDirection: 'row', alignItems: 'center',
+                    justifyContent: 'flex-start', height: '35px'}
+                }>
+                  <Button style={{marginRight: '20px'}} bsStyle="success" onClick={() => this.add()}>
+                    Add another
+                  </Button>
                   <Button bsStyle="primary" type="submit"> Submit </Button>
                 </div>
           </form>
