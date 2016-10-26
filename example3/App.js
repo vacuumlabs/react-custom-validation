@@ -246,46 +246,46 @@ class MathProblems extends React.Component {
           }
           style={{display: 'flex', flexDirection: 'column'}}
           >
-                  <FormGroup style={{alignSelf: 'flex-start', flex: '0 0'}} controlId="formControlsSelect">
-                    <ControlLabel>Select operation</ControlLabel>
-                    <FormControl
-                      componentClass="select"
-                      placeholder="select"
-                      value={operation}
-                      onChange={(e) => this.dispatchOperation(e.target.value)}
-                    >
-                      <option value="add">Addition</option>
-                      <option value="multiply">Multiplication</option>
-                      <option value="subtract">Subtraction</option>
-                    </FormControl>
-                  </FormGroup>
-              {problemIds.map((id) =>
-                <div key={id} style={
-                  {display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'stretch'}
-                }>
-                  {this.renderField(id, 'number1', '')}
-                  <Button style={{height: '35px', margin: '0 10px'}}> {SYMBOLS[operation]} </Button>
-                  {this.renderField(id, 'number2', '')}
-                <Button style={{height: '35px', margin: '0 10px'}}> = </Button>
-                  {this.renderField(id, 'result', 'Result')}
-                  <Button style={{height: '35px', margin: '0 10px'}} onClick={() => this.remove(id)}> X </Button>
-                  <div style={
-                    {display: 'flex', alignItems: 'center', justifyContent:
-                      'center', textAlign: 'center', height: '35px'}
-                  }>
-                    {validationMessage(validations[id])}
-                  </div>
-                </div>
-              )}
+            <FormGroup style={{alignSelf: 'flex-start', flex: '0 0'}} controlId="formControlsSelect">
+              <ControlLabel>Select operation</ControlLabel>
+              <FormControl
+                componentClass="select"
+                placeholder="select"
+                value={operation}
+                onChange={(e) => this.dispatchOperation(e.target.value)}
+              >
+                <option value="add">Addition</option>
+                <option value="multiply">Multiplication</option>
+                <option value="subtract">Subtraction</option>
+              </FormControl>
+            </FormGroup>
+            {problemIds.map((id) =>
+              <div key={id} style={
+                {display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'stretch'}
+              }>
+                {this.renderField(id, 'number1', '')}
+                <Button style={{height: '35px', margin: '0 10px'}}> {SYMBOLS[operation]} </Button>
+                {this.renderField(id, 'number2', '')}
+              <Button style={{height: '35px', margin: '0 10px'}}> = </Button>
+                {this.renderField(id, 'result', 'Result')}
+                <Button style={{height: '35px', margin: '0 10px'}} onClick={() => this.remove(id)}> X </Button>
                 <div style={
-                  {display: 'flex', flexDirection: 'row', alignItems: 'center',
-                    justifyContent: 'flex-start', height: '35px'}
+                  {display: 'flex', alignItems: 'center', justifyContent:
+                    'center', textAlign: 'center', height: '35px'}
                 }>
-                  <Button style={{marginRight: '20px'}} bsStyle="success" onClick={() => this.add()}>
-                    Add another
-                  </Button>
-                  <Button bsStyle="primary" type="submit"> Submit </Button>
+                  {validationMessage(validations[id])}
                 </div>
+              </div>
+            )}
+            <div style={
+              {display: 'flex', flexDirection: 'row', alignItems: 'center',
+                justifyContent: 'flex-start', height: '35px'}
+            }>
+              <Button style={{marginRight: '20px'}} bsStyle="success" onClick={() => this.add()}>
+                Add another
+              </Button>
+              <Button bsStyle="primary" type="submit"> Submit </Button>
+            </div>
           </form>
         </Panel>
       </div>
