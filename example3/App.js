@@ -235,8 +235,8 @@ class MathProblems extends React.Component {
               this.props.onFormValid((valid) => {
                 if (valid) {
                   alert('Everything correct!') //eslint-disable-line no-alert
-                  this.props.fieldEvent('reset')
-                  this.reset()
+                  //this.props.fieldEvent('reset')
+                  //this.reset()
                 } else {
                   alert('Something is wrong.') //eslint-disable-line no-alert
                 }
@@ -283,7 +283,7 @@ class MathProblems extends React.Component {
               <Button style={{marginRight: '20px'}} bsStyle="success" onClick={() => this.add()}>
                 Add another
               </Button>
-              <Button bsStyle="primary" type="submit"> Submit </Button>
+              <Button bsStyle="primary" type="submit"> Check </Button>
             </div>
           </form>
         </Panel>
