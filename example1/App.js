@@ -104,6 +104,7 @@ function validationConfig(props) {
   return {
     fields: Object.keys(fields),
     onValidation: (name, data) => updateValidation(dispatch, name, data),
+    typingDebounce: 2000,
     validations: {
       email: {
         rules: {
@@ -153,7 +154,7 @@ class Registration extends React.Component {
     }
 
     return (
-      <FormGroup controlId={name} validationState={style}>
+      <FormGroup controlId={name} validationState={style} style={{height: '90px'}}>
         <ControlLabel>{label}</ControlLabel>
         <FormControl
           type="text"
@@ -170,7 +171,7 @@ class Registration extends React.Component {
     let vdata = this.props.appState.validations
 
     return (
-      <Panel header={"Registration"}>
+      <Panel>
         <form onSubmit={
           (e) => {
             e.preventDefault()
@@ -182,6 +183,8 @@ class Registration extends React.Component {
               if (valid) {
                 let {fields: {email}} = this.props.appState
                 alert(`Registration successful! Email=${email}`) //eslint-disable-line no-alert
+              } else {
+                alert('There are errors in the form!') //eslint-disable-line no-alert
               }
             })
           }
