@@ -61,7 +61,7 @@ const initialState = {
 
 function isResultCorrect(number1, number2, result, operation) {
   let i = (n) => parseInt(n, 10)
-  return Promise.delay(1000).then(() =>
+  return Promise.delay(3000).then(() =>
     operation(i(number1), i(number2)) === i(result) ? valid() : invalid('wrong')
   )
 }
@@ -190,7 +190,7 @@ class MathProblems extends React.Component {
     })
   }
 
-  renderField(id, name, placeholder) {
+  renderField(id, name) {
     let {fieldEvent} = this.props
     let field = `${id}-${name}`
     let {appState: {problems, validations}} = this.props
@@ -202,7 +202,6 @@ class MathProblems extends React.Component {
       <FormGroup controlId={name} validationState={_style}>
         <FormControl
           type="text"
-          placeholder={placeholder}
           onChange={(e) => {
             this.dispatchValue(id, name, e.target.value)
             fieldEvent('change', field)
@@ -263,11 +262,11 @@ class MathProblems extends React.Component {
               <div key={id} style={
                 {display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'stretch'}
               }>
-                {this.renderField(id, 'number1', '')}
+                {this.renderField(id, 'number1')}
                 <Button style={{height: '35px', margin: '0 10px'}}> {SYMBOLS[operation]} </Button>
-                {this.renderField(id, 'number2', '')}
+                {this.renderField(id, 'number2')}
               <Button style={{height: '35px', margin: '0 10px'}}> = </Button>
-                {this.renderField(id, 'result', 'Result')}
+                {this.renderField(id, 'result')}
                 <Button style={{height: '35px', margin: '0 10px'}} onClick={() => this.remove(id)}> X </Button>
                 <div style={
                   {display: 'flex', alignItems: 'center', justifyContent:
