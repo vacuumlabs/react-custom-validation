@@ -233,11 +233,10 @@ class MathProblems extends React.Component {
                 }
               })
             }
-          }>
-            <Grid>
-              <Row>
-                <Col md={6}>
-                  <FormGroup controlId="formControlsSelect">
+          }
+          style={{display: 'flex', flexDirection: 'column'}}
+          >
+                  <FormGroup style={{alignSelf: 'flex-start', flex: '0 0'}} controlId="formControlsSelect">
                     <ControlLabel>Select operation</ControlLabel>
                     <FormControl
                       componentClass="select"
@@ -249,38 +248,23 @@ class MathProblems extends React.Component {
                       <option value="subtract">Subtraction</option>
                     </FormControl>
                   </FormGroup>
-                </Col>
-              </Row>
               {problemIds.map((id) =>
-                <Row key={id}>
-                  <Col md={2}>
-                    {this.renderField(id, 'number1', '')}
-                  </Col>
-                  <Col md={1}> <Button> {SYMBOLS[operation]} </Button> </Col>
-                  <Col md={2}>
-                    {this.renderField(id, 'number2', '')}
-                  </Col>
-                  <Col md={1}> <Button> = </Button> </Col>
-                  <Col md={2}>
-                    {this.renderField(id, 'result', 'Result')}
-                  </Col>
-                  <Col md={1}>
-                    <Button onClick={() => this.props.remove(id)}> X </Button>
-                  </Col>
-                  <Col md={5}>
+                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'stretch'}}>
+                  {this.renderField(id, 'number1', '')}
+                  <Button style={{height: '35px', margin: '0 10px'}}> {SYMBOLS[operation]} </Button>
+                  {this.renderField(id, 'number2', '')}
+                <Button style={{height: '35px', margin: '0 10px'}}> = </Button>
+                  {this.renderField(id, 'result', 'Result')}
+                  <Button style={{height: '35px', margin: '0 10px'}} onClick={() => this.props.remove(id)}> X </Button>
+                  <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', height: '35px'}}>
                     {validationMessage(validations[id])}
-                  </Col>
-                </Row>
+                  </div>
+                </div>
               )}
-              <Row>
-                <Col md={2}>
-                  <Button bsStyle="success" onClick={() => this.add()}> Add another </Button>
-                </Col>
-                <Col md={2}>
+                <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', height: '35px'}}>
+                  <Button style={{marginRight: '20px'}} bsStyle="success" onClick={() => this.add()}> Add another </Button>
                   <Button bsStyle="primary" type="submit"> Submit </Button>
-                </Col>
-              </Row>
-            </Grid>
+                </div>
           </form>
         </Panel>
       </div>
