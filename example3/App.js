@@ -3,8 +3,6 @@
 import React from 'react'
 import Promise from 'bluebird'
 import {
-  valid,
-  invalid,
   validated,
   initValidation,
   isRequired,
@@ -62,12 +60,12 @@ const initialState = {
 function isResultCorrect(number1, number2, result, operation) {
   let i = (n) => parseInt(n, 10)
   return Promise.delay(3000).then(() =>
-    operation(i(number1), i(number2)) === i(result) ? valid() : invalid('wrong')
+    operation(i(number1), i(number2)) === i(result) ? null : 'wrong'
   )
 }
 
 function isNumber(value) {
-  return isNaN(value) ? invalid('NaN') : valid()
+  return isNaN(value) ? 'NaN' : null
 }
 
 // Wrapper providing poor man's redux

@@ -513,15 +513,6 @@ Returns initial status of validation data as provided by this library. Can be
 used to initialize the app state. It is recommended (but not necessary) to keep
 the validation data in the app state structured in the same way.
 
-#### `valid()`
-
-Returns valid validation result, that is `{isValid: true, reason: null}`. Useful
-for writing custom rule functions.
-
-#### `invalid(reason)`
-
-Returns invalid validation result with specified reason, that is `{isValid:
-false, reason: reason}`. Useful for writing custom rule functions.
 
 ## Defining Custom Rules
 
@@ -529,21 +520,21 @@ Rules are ordinary javascript functions, so it is extremely easy to add new
 rules.
 
 The rule function can be any function that:
-- takes in one argument
-- returns object with keys `valid` and `reason` (`reason == null` if `valid` is
-  `true`) or a `Promise` of such object
+- returns `null` or a `Promise` that resolves to `null` if the arguments satisfy
+  the rule
+- returns some error description (`!= null`) or a `Promise` of such error
+  description if the arguments do not satisfy the rule
 
 For example:
 
 ```javascript
 function areSame({value1, value2}) {
-  if (value1 === value2) return {isValid: true}
-  else return {isValid: false, reason: 'Values are different'}
+  return (value1 === value2) ? null : 'Values are different'
 }
 
 function isUnique({value}) {
   let isValid = value.indexOf('used') === -1
-  let response = isValid ? {isValid: true} : {isValid: false, reason: 'The value is not unique.'}
+  let response = isValid ? null : 'The value is not unique.'
   return Promise.delay(10).then(() => response)
 }
 ```
@@ -557,27 +548,27 @@ In larger and more serious projects one might need to translate the validation
 messages to other languages, or one might want to provide very specific
 validation messages. The recommended way of achieving this is outlined below.
 
-Write rule functions that return object as a reason:
+Write rule functions that return object:
 ```
 function hasLength({value, min, max}) {
   if (min != null && value.length < min) {
-    return invalid({code: 'too short', args: {min}, msg: `Length should be at least ${min}.`}})
+    return {code: 'too short', args: {min}, msg: `Length should be at least ${min}.`}
   }
   if (max != null && value.length > max) {
-    return invalid({code: 'too long', args: {max}, msg: `Length should be at most ${max}.`}})
+    return {code: 'too long', args: {max}, msg: `Length should be at most ${max}.`}
   }
-  return valid()
+  return null
 }
 ```
 
-Write a `displayMessage` function that can handle all types of reasons that you
+Write a `displayMessage` function that can handle all types of errors that you
 are using, for example:
 ```
-function displayMessage(reason, dictionary) {
-  if (typeof reason === 'string') {
-    return reason
+function displayMessage(error, dictionary) {
+  if (typeof error === 'string') {
+    return error
   }
-  {code, args, msg} = reason
+  {code, args, msg} = error
   if (dictionary[code] != null) {
     return dictionary[code](args)
   } else {
