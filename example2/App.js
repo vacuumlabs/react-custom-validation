@@ -6,8 +6,6 @@ import {
   validated,
   initValidation,
   isFormValid,
-  valid,
-  invalid
 } from '../lib'
 import {
   ControlLabel,
@@ -28,9 +26,9 @@ import Name from './Name'
 function isTotalCountCorrect({totalCount, count}) {
   let result
   if (count === totalCount) {
-    result = valid()
+    result = null
   } else {
-    result = invalid('Total count is incorrect!')
+    result = 'Total count is incorrect!'
   }
   return Promise.delay(3000).then(() => result)
 }

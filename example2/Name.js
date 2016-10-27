@@ -1,7 +1,7 @@
 'use strict'
 
 import React from 'react'
-import {validated, valid, invalid} from '../lib'
+import {validated} from '../lib'
 import {FormGroup, FormControl, Row, Col, Button} from 'react-bootstrap'
 import R from 'ramda'
 import {style, validationMessage} from './helpers'
@@ -17,9 +17,9 @@ function updateValidation(dispatch, name, data) {
 
 function isConsistent({first, last, full}) {
   if (`${first} ${last}` === full) {
-    return valid()
+    return null
   } else {
-    return invalid(`"${first} ${last}" is not equal to "${full}"!`)
+    return `"${first} ${last}" is not equal to "${full}"!`
   }
 }
 

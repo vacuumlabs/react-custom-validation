@@ -10,8 +10,6 @@ import {
   hasNumber,
   hasLength,
   areSame,
-  valid,
-  invalid
 } from '../lib'
 import {
   ControlLabel,
@@ -29,7 +27,7 @@ import {cloneDeep} from 'lodash'
 
 function isUnique(value, {time}) {
   let isValid = value.indexOf('used') === -1
-  let response = isValid ? valid() : invalid('The value is not unique.')
+  let response = isValid ? null : 'The value is not unique.'
   return Promise.delay(time).then(() => response)
 }
 
