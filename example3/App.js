@@ -4,7 +4,6 @@ import React from 'react'
 import Promise from 'bluebird'
 import {
   validated,
-  initValidation,
   isRequired,
 } from '../lib'
 import {
@@ -50,9 +49,6 @@ const initialState = {
   problems: {
     id1: initProblem()
   },
-  validations: {
-    id1: initValidation(),
-  },
   operation: 'add',
   lastId: 1,
 }
@@ -92,19 +88,9 @@ export class App extends React.Component {
   }
 }
 
-function updateValidation(dispatch, name, data) {
-  dispatch({
-    fn: (state) => {
-      return R.assocPath(['validations', name], {...state.validations[name], ...data}, state)
-    },
-    description: `Got data for ${name} validation: ${JSON.stringify(data)}`
-  })
-}
-
 function validationConfig(props) {
   let {
     appState: {problems, operation},
-    dispatch
   } = props
 
   let validations = {}
@@ -129,7 +115,6 @@ function validationConfig(props) {
 
   return {
     fields,
-    onValidation: (name, data) => updateValidation(dispatch, name, data),
     validations,
   }
 }
@@ -141,6 +126,7 @@ class MathProblems extends React.Component {
     dispatch: React.PropTypes.func.isRequired,
     submit: React.PropTypes.func.isRequired,
     fieldEvent: React.PropTypes.func.isRequired,
+    validation: React.PropTypes.object.isRequired,
   }
 
   reset() {
@@ -154,7 +140,6 @@ class MathProblems extends React.Component {
     this.props.dispatch({
       fn: (state) => {
         let s = R.dissocPath(['problems', id], state)
-        s = R.dissocPath(['validations', id], s)
         return s
       },
       description: `Remove problem for id=${id}`
@@ -166,7 +151,6 @@ class MathProblems extends React.Component {
       fn: (state) => {
         let {lastId: id} = state
         let s = R.assocPath(['problems', `id${id + 1}`], initProblem(), state)
-        s = R.assocPath(['validations', `id${id + 1}`], initValidation(), s)
         s = R.assoc('lastId', id + 1, s)
         return s
       },
@@ -191,10 +175,10 @@ class MathProblems extends React.Component {
   renderField(id, name) {
     let {fieldEvent} = this.props
     let field = `${id}-${name}`
-    let {appState: {problems, validations}} = this.props
+    let {appState: {problems}, validation} = this.props
 
     let value = problems[id][name]
-    let _style = style(validations[id])
+    let _style = style(validation[id])
 
     return (
       <FormGroup controlId={name} validationState={_style}>
@@ -217,8 +201,8 @@ class MathProblems extends React.Component {
       appState: {
         problems,
         operation,
-        validations,
       },
+      validation,
     } = this.props
 
     let problemIds = Object.keys(problems)
@@ -271,7 +255,7 @@ class MathProblems extends React.Component {
                   {display: 'flex', alignItems: 'center', justifyContent:
                     'center', textAlign: 'center', height: '35px'}
                 }>
-                  {validationMessage(validations[id])}
+                  {validationMessage(validation[id])}
                 </div>
               </div>
             )}
