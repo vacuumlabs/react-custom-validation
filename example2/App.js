@@ -115,7 +115,7 @@ class Registration extends React.Component {
   static propTypes = {
     appState: React.PropTypes.object.isRequired,
     dispatch: React.PropTypes.func.isRequired,
-    onFormValid: React.PropTypes.func.isRequired,
+    submit: React.PropTypes.func.isRequired,
     fieldEvent: React.PropTypes.func.isRequired,
   }
 
@@ -175,18 +175,19 @@ class Registration extends React.Component {
               for (let id in names) {
                 this.nameComponents[id].fieldEvent('submit')
               }
-              this.props.onFormValid((valid) => {
-                if (valid) {
+              this.props.submit(
+                () => {
                   alert('Registration successful!') //eslint-disable-line no-alert
                   for (let id in names) {
                     this.nameComponents[id].fieldEvent('reset')
                   }
                   this.props.fieldEvent('reset')
                   this.reset()
-                } else {
+                },
+                () => {
                   alert('There are errors in the form.') //eslint-disable-line no-alert
                 }
-              })
+              )
             }
           }>
             <Grid>

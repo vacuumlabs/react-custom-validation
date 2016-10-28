@@ -348,8 +348,8 @@ For convenience reasons, object with field names as keys is also accepted:
 
 #### `formValid` (optional)
 
-Validity of the whole form. This information is used to provide the
-`onFormValid` prop.
+Validity of the whole form. This information is used to provide the `submit`
+prop.
 
 The value can be
 - `true`: all fields are valid
@@ -387,26 +387,25 @@ validation results being shown only on blur or submit.
 The validated React component gets three new props (apart from all props that
 were passed to it) from the validation library.
 
-#### `onFormValid`
+#### `submit`
 
-Can be used to prevent invalid data submission. The function takes in one
-argument, a function that specifies what should happen based on form validity.
+Can be used to prevent invalid data submission. The function takes in two
+arguments, a function that is called in case the form validity is `true`, and a
+function that is called in case the form validity is `false`. Both arguments are
+optional, defaulting to empty functions.
 
 Example of usage:
 ```
 class RegistrationForm extends React.Component {
-  myOnSubmitHandler = (valid) => {
-    if (valid) {
-      alert('Registration successful!')
-    }
-  }
-
   render() {
    ...
     <form onSubmit={
       (e) => {
         e.preventDefault()
-        this.props.onFormValid(this.myOnSubmitHandler)
+        this.props.submit(
+          () => alert('Registration successful!'),
+          () => alert('There are errors in the form!')
+        )
       }
     }>
     ...
@@ -415,23 +414,23 @@ class RegistrationForm extends React.Component {
 ```
 It is recommended to keep the submit button enabled while the user is filling
 out the form. Invalid data submission can be easily avoided by using the
-provided `onFormValid` function in the following way. When the user clicks on
-the submit button, the `onFormValid` function should be called with some
-`myOnSubmitHandler` as an argument. The `onFormValid` function internally waits
-until the validity calculation for the form is finished and then calls the
-`myOnSubmitHandler`, providing the form validity as an argument. If the validity
-of the form is known already when user clicks on the submit button,
-`myOnSubmitHandler` is called right away.
+provided `submit` function in the following way. When the user clicks on the
+submit button, the `submit` function should be called with `onValid` and
+`onInvalid` handlers provided as arguments. The `submit` function internally
+waits until the validity calculation for the form is finished and then calls the
+`onValid` or `onInvalid` handler, depending on the form validity. If the
+validity of the form is known already when user clicks on the submit button, the
+`onValid` (or `onInvalid`) handler is called right away.
 
 If the user submits the form while validity calculation is in progress and the
 user continues typing (and thus changing the form field values), the
-`myOnSubmitHandler` call will be canceled. It will also be canceled if anything
-in `validations` part of the validation config changes. This is to prevent
-possible mismatch between validated and actually submitted fields.
+`onValid`/`onInvalid` handler call will be canceled. It will also be canceled if
+anything in `validations` part of the validation config changes. This is to
+prevent possible mismatch between validated and actually submitted fields.
 
 Note that the validation library does not prevent multiple submits while
-`myOnSubmitHandler` is running; the submit button should be therefore disabled
-while the `myOnSubmitHandler` is running.
+`onValid` handler is running; the submit button should be therefore disabled
+while the `onValid` handler is running.
 
 For information on form validity calculation see
 [here](https://github.com/vacuumlabs/react-validation/tree/change-api#formvalid-optional).
