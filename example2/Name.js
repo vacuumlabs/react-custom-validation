@@ -52,7 +52,6 @@ class Name extends React.Component {
     state: React.PropTypes.object.isRequired,
     dispatch: React.PropTypes.func.isRequired,
     remove: React.PropTypes.func.isRequired,
-    onFormValid: React.PropTypes.func.isRequired,
     fieldEvent: React.PropTypes.func.isRequired,
   }
 

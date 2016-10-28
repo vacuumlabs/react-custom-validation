@@ -133,7 +133,7 @@ class Registration extends React.Component {
   static propTypes = {
     appState: React.PropTypes.object.isRequired,
     dispatch: React.PropTypes.func.isRequired,
-    onFormValid: React.PropTypes.func.isRequired,
+    submit: React.PropTypes.func.isRequired,
     fieldEvent: React.PropTypes.func.isRequired,
     connectField: React.PropTypes.func.isRequired,
   }
@@ -177,14 +177,15 @@ class Registration extends React.Component {
             // When user clicks on the submit button, wait until validity of
             // the form is known (!= null) and only then proceed with the
             // onSubmit handler.
-            this.props.onFormValid((valid) => {
-              if (valid) {
+            this.props.submit(
+              () => {
                 let {fields: {email}} = this.props.appState
                 alert(`Registration successful! Email=${email}`) //eslint-disable-line no-alert
-              } else {
+              },
+              () => {
                 alert('There are errors in the form!') //eslint-disable-line no-alert
               }
-            })
+            )
           }
         }>
           <Grid>

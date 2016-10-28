@@ -139,7 +139,7 @@ class MathProblems extends React.Component {
   static propTypes = {
     appState: React.PropTypes.object.isRequired,
     dispatch: React.PropTypes.func.isRequired,
-    onFormValid: React.PropTypes.func.isRequired,
+    submit: React.PropTypes.func.isRequired,
     fieldEvent: React.PropTypes.func.isRequired,
   }
 
@@ -230,15 +230,16 @@ class MathProblems extends React.Component {
             (e) => {
               e.preventDefault()
               this.props.fieldEvent('submit')
-              this.props.onFormValid((valid) => {
-                if (valid) {
+              this.props.submit(
+                () => {
                   alert('Everything correct!') //eslint-disable-line no-alert
                   //this.props.fieldEvent('reset')
                   //this.reset()
-                } else {
+                },
+                () => {
                   alert('Something is wrong.') //eslint-disable-line no-alert
                 }
-              })
+              )
             }
           }
           style={{display: 'flex', flexDirection: 'column'}}
