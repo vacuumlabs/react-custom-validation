@@ -178,18 +178,20 @@ and
 [here](https://github.com/vacuumlabs/react-validation/tree/change-api#connectfieldfield-onchange-onblur)).
 
 In return, the validation library provides one with data on validity and
-show/hide behavior. This data is provided via `onValidation` handler. It is
-recommended to save the data to the app state.
+show/hide behavior. This data is provided in two alternative ways: via
+`onValidation` handler (so that they can be handled in any desired way - e.g.
+dispatched to the app state) and as `props` to the React component (can save
+some code if the validation data is needed only in that component).
 
 The data can then be used in the `render` function in any desired way, for
 example:
 ```javascript
 render() {
-  // validation data were saved to app state and are available here
+  // validation data provided as props by the validated decorator
   let {
     email: {isValid: emailValid, error: {rule: emailRule, reason: emailReason}, show: emailShow}
     ...
-  } = this.props.validations
+  } = this.props.validation
 
   return (
     <div>
@@ -281,16 +283,38 @@ validations: {
   },
 ```
 
-#### `onValidation`
+#### `fields`
+
+List of all field names that require validation, for example:
+
+```
+  fields: ['email', 'password', 'rePassword']
+```
+
+
+For convenience reasons, object with field names as keys is also accepted:
+
+```
+  fields: {
+    email: 'my.email@example.com',
+    password: 'verysecret123',
+    rePassword: 'verysecr',
+  }
+```
+
+#### `onValidation` (optional)
 
 Handler function that is called by the validation library whenever new
-validation data is available.
+validation data (i.e. validation results and recommendations for showing/hiding
+these validation results) is available. It provides the application developer
+with full control over handling the calculated validation data.
 
-The validation library does not do any auto-magic. Instead, it just calculates
-the validation results and recommendations for showing/hiding these validation
-results and calls the `onValidation` handler when new data is available. This
-way the application developer has full control and responsibility for handling
-the calculated validation data provided by the validation library.
+The implementation of this handler is optional and if not provided, it defaults
+to empty function. If the validation data is needed only from within the React
+form component, one can use the provided (`validation`
+prop)[https://github.com/vacuumlabs/react-validation#validation] to access the
+validation data. However, if the data is needed elsewhere in the application,
+the `onValidation` handler needs to be implemented.
 
 The `onValidation` handler takes in two arguments:
 - `name`: name of the corresponding validation as defined in `validations` object
@@ -315,7 +339,7 @@ Note that `rule` and `reason` are not undefined only if `isValid` is `false`.
 
 The recommended implementation of the `onValidation` handler should simply save
 the provided data in the application state so that they can be accessed there
-from the `render` method. Example:
+from the `render` method when needed. Example:
 ```
 onValidation: (name, data) => dispatch(
   // We dispatch a function that defines how app state should be modified
@@ -325,25 +349,6 @@ onValidation: (name, data) => dispatch(
   },
   description: `Got data for ${name} validation: ${JSON.stringify(data)}`
 )
-```
-
-#### `fields`
-
-List of all field names that require validation, for example:
-
-```
-  fields: ['email', 'password', 'rePassword']
-```
-
-
-For convenience reasons, object with field names as keys is also accepted:
-
-```
-  fields: {
-    email: 'my.email@example.com',
-    password: 'verysecret123',
-    rePassword: 'verysecr',
-  }
 ```
 
 #### `formValid` (optional)
@@ -356,18 +361,12 @@ The value can be
 - `false`: at least one field is invalid
 - `null`: validity is unknown (some validations are pending)
 
-There is a [helper
+This field is optional; if it is not specified, `isFormValid(validation)` is
+used, where `validation` is validation data that is also provided as the
+prop `validation`[https://github.com/vacuumlabs/react-validation#validation] to
+the validated form component and `isFormValid` is a [helper
 function](https://github.com/vacuumlabs/react-validation/tree/change-api#isformvalidvalidationdata)
-in the validation library for calculating overall form validity, so the usage
-should usually look as follows:
-
-```
-  formValid: isFormValid(props.validations)
-```
-
-This field is optional; if it is not specified, `isFormValid(validations)` is
-used (`validations` being validation results internally stored by the validation
-library).
+for calculating overall form validity.
 
 #### `debounce` (optional)
 
@@ -384,7 +383,7 @@ validation results being shown only on blur or submit.
 
 ### Provided props
 
-The validated React component gets three new props (apart from all props that
+The validated React component gets four new props (apart from all props that
 were passed to it) from the validation library.
 
 #### `submit`
@@ -495,14 +494,32 @@ Example of usage:
 />
 ```
 
+#### `validation`
+
+If one just needs to access the validation data (validation results and
+show/hide recommendations) from within the validated form, one can read this
+data from the `validation` prop that is provided to this form. In such case one
+does not have to implement the `onValidation` handler. However, whenever the
+validation data are needed by some other react components, it is recommended to
+implement the `onValidation` instead to save the validation data to the app
+state, where the data can be used by any part of the application.
+
+Example stucture of data:
+```
+let {
+  email: {isValid, error: {reason, rule}},
+  password: {...}
+} = this.props.validation
+```
+
 ### Helper Functions
 
-#### `isFormValid(validationData)`
+#### `isFormValid(validation)`
 
 Returns validity of multiple validation results. The result is false if any
 single validation contains valid = false, null if any validation contains valid
-= null (and none is false) and true otherwise. The argument `validationData`
-should be a dict of validation results as provided by the validation library.
+= null (and none is false) and true otherwise. The argument `validation` should
+be a dict of validation results as provided by the validation library.
 
 #### `initValidation()`
 

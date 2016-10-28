@@ -80,28 +80,16 @@ export class App extends React.Component {
   }
 }
 
-function updateValidation(dispatch, name, data) {
-  dispatch({
-    fn: (state) => {
-      // create new state with updated validation data, while keeping the old state the same
-      return R.assocPath(['validations', name], data, state)
-    },
-    description: `Got data for ${name} validation: ${JSON.stringify(data)}`
-  })
-}
-
 function validationConfig(props) {
   let {
     appState: {
       fields,
       fields: {email, password, rePassword},
     },
-    dispatch
   } = props
 
   return {
     fields: Object.keys(fields),
-    onValidation: (name, data) => updateValidation(dispatch, name, data),
     typingDebounce: 2000,
     validations: {
       email: {
@@ -166,7 +154,7 @@ class Registration extends React.Component {
   }
 
   render() {
-    let vdata = this.props.appState.validations
+    let vdata = this.props.validation
 
     return (
       <Panel>
