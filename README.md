@@ -389,10 +389,13 @@ were passed to it) from the validation library.
 
 #### `submit`
 
-Can be used to prevent invalid data submission. The function takes in two
-arguments, a function that is called in case the form validity is `true`, and a
-function that is called in case the form validity is `false`. Both arguments are
-optional, defaulting to empty functions.
+It is recommended to call this function on form submit. It internally waits
+until the form validity calculation is finished and calls one of the provided
+handlers: `onValid` in case the form validity is `true` or `onInvalid` in case
+the form validity is `false`. If the validity of the form is known already when
+user clicks on the submit button, the `onValid` (or `onInvalid`) handler is
+called right away. Both, `onValid` and `onInvalid` arguments are optional,
+defaulting to empty functions.
 
 Example of usage:
 ```
@@ -412,15 +415,10 @@ class RegistrationForm extends React.Component {
   }
 }
 ```
-It is recommended to keep the submit button enabled while the user is filling
-out the form. Invalid data submission can be easily avoided by using the
-provided `submit` function in the following way. When the user clicks on the
-submit button, the `submit` function should be called with `onValid` and
-`onInvalid` handlers provided as arguments. The `submit` function internally
-waits until the validity calculation for the form is finished and then calls the
-`onValid` or `onInvalid` handler, depending on the form validity. If the
-validity of the form is known already when user clicks on the submit button, the
-`onValid` (or `onInvalid`) handler is called right away.
+
+Since invalid data submission can be easily avoided by using this `submit`
+function, it is recommended to keep the submit button enabled while the user is
+filling out the form.
 
 If the user submits the form while validity calculation is in progress and the
 user continues typing (and thus changing the form field values), the
