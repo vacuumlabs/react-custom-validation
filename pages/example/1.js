@@ -24,7 +24,6 @@ class App extends React.Component {
       onChange={this.fieldChange}
       onValid={() => alert('Submitting...')} // eslint-disable-line no-alert
       onInvalid={() => alert('Error!')} // eslint-disable-line no-alert
-      onValidation={this.onValidation}
     />)
   }
 }
@@ -66,8 +65,6 @@ function validationConfig(props) {
         fields: ['password', 'rePassword']
       }
     },
-
-    onValidation: props.onValidation
   }
 }
 

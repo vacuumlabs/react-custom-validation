@@ -60,7 +60,6 @@ class App extends React.Component {
       removeProblem={this.removeProblem}
       onValid={() => alert('Everything correct!')} // eslint-disable-line no-alert
       onInvalid={() => alert('Something is wrong.')} // eslint-disable-line no-alert
-      onValidation={this.onValidation}
     />)
   }
 }
