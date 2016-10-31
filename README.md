@@ -69,6 +69,11 @@ Example 1 illustrates the usage of this library in a very simple case. It is
 highly recommended to review and understand the code of example 1, as it can
 help to understand this documentation and basic features of this library.
 
+Example 2 is more complicated and is used to show that this library can be used
+even when the requirements are more complex (e.g. when one wants to dynamically
+add and remove fields). The user is encouraged to review the code of example 2
+if they want to create more complex validated forms.
+
 ## Basic Usage
 
 Let us start with a simple registration form that contains three validated
