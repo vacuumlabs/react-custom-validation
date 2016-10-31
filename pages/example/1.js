@@ -1,6 +1,7 @@
 import React from 'react'
 import Promise from 'bluebird'
 import update from 'immutability-helper'
+import validator from 'validator'
 import style from './style'
 import {validated} from '../../lib'
 
@@ -29,16 +30,16 @@ class App extends React.Component {
 }
 
 const isEmail = (email) =>
-  email.includes('@') ? null : 'This is not valid email.'
+  validator.isEmail(email) ? null : 'This is not a valid email.'
 
 const isUnique = (email) => Promise.delay(1000)
   .then(() => email.includes('used') ? 'This email is already used.' : null)
 
 const minLength = (password, length) =>
-  password.length >= length ? null : 'Password too short.'
+  password.length >= length ? null : 'Password is too short.'
 
 const areSame = (password, rePassword) =>
-  password === rePassword ? null : 'Do not match.'
+  password === rePassword ? null : 'Passwords do not match.'
 
 function validationConfig(props) {
   const {email, password, rePassword} = props.fields

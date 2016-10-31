@@ -15,8 +15,7 @@
   "dependencies": {
     "bluebird": "^3.4.1",
     "lodash": "^4.14.1",
-    "rx": "^4.1.0",
-    "validator": "^5.5.0"
+    "rx": "^4.1.0"
   },
   "peerDependencies": {
     "react": ">=15.0.0 <16.0.0",
@@ -48,6 +47,7 @@
     "react-dom": "^15.3.0",
     "reactify": "^1.1.1",
     "run-sequence": "^1.2.2",
+    "validator": "^5.5.0",
     "vinyl-source-stream": "^1.1.0",
     "yargs": "^4.8.1"
   }
