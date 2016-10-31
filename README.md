@@ -58,23 +58,21 @@ React-Intl or other (custom?) i18n solution.
 ## Try it out
 
 To run the examples locally:
-- Clone the repository: `git clone git@github.com:vacuumlabs/react-validation.git`
-- `npm install`
-- Build the example: `gulp build-example1` or `gulp build-example2`
-- The directory `/path/to/validation-repo/public` will be created that includes
-  all html and js code needed to run the example.
-- Open the file `/path/to/validation-repo/public/index.html` in your browser.
-  You do not need to run any server.
+* Clone the repository: `git clone git@github.com:vacuumlabs/react-validation.git`
+* `npm install`
+* `npm run example`
+*  Navigate to `localhost:3000`
 
-Example 1 illustrates the usage of this library in a very simple case. It is
-highly recommended to review and understand the code of example 1, as it can
+Code of the examples is located in `pages/example/` directory.
+
+Examples 1 and 2 illustrate the usage of this library in very simple cases. It is
+highly recommended to review and understand the code of these examples, as it can
 help to understand this documentation and basic features of this library.
 
-Example 2 is more complicated and is used to show that this library can be used
-even when the requirements are more complex (e.g. dynamically adding and
-removing fields, using validated sub-forms, etc.). The user is encouraged to
-review the code of example 2 if they want to create more complex validated
-forms.
+Example 3 is more complicated and is used to show that this library can be used
+even when the requirements are more complex (e.g. when one wants to dynamically
+add and remove fields). The user is encouraged to review the code of example 3
+if they want to create more complex validated forms.
 
 ## Basic Usage
 
