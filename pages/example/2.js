@@ -1,5 +1,6 @@
 import React from 'react'
 import Promise from 'bluebird'
+import update from 'immutability-helper'
 import {validated} from '../../lib'
 
 const add = (a, b) => a + b
@@ -12,6 +13,12 @@ const OPERATIONS = [
   {id: 'subtract', symbol: '-', fn: subtract, desc: 'Subtraction'},
 ]
 
+update.extend('$delete', function(key, object) {
+  let o = {...object}
+  delete o[key]
+  return o
+})
+
 class App extends React.Component {
   state = {
     problems: {
@@ -22,8 +29,7 @@ class App extends React.Component {
   }
 
   numberChange = (id, number, value) => {
-    this.state.problems[id][number] = value
-    this.setState(this.state)
+    this.setState(update(this.state, {problems: {[id]: {[number]: {$set: value}}}}))
   }
 
   operationChange = (value) => {
@@ -32,14 +38,15 @@ class App extends React.Component {
   }
 
   addProblem = () => {
-    this.state.lastId += 1
-    this.state.problems[`id${this.state.lastId}`] = {number1: '', number2: '', result: ''}
-    this.setState(this.state)
+    let nextId = this.state.lastId + 1
+    this.setState(update(this.state, {
+      problems: {[`id${nextId}`]: {$set: {number1: '', number2: '', result: ''}}},
+      lastId: {$set: nextId}
+    }))
   }
 
   removeProblem = (id) => {
-    delete this.state.problems[id]
-    this.setState(this.state)
+    this.setState(update(this.state, {problems: {$delete: id}}))
   }
 
   render() {

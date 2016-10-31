@@ -1,7 +1,8 @@
 import React from 'react'
+import Promise from 'bluebird'
+import update from 'immutability-helper'
 import style from './style'
 import {validated} from '../../lib'
-import Promise from 'bluebird'
 
 class App extends React.Component {
   state = {
@@ -13,8 +14,7 @@ class App extends React.Component {
   }
 
   fieldChange = (field, value) => {
-    this.state.fields[field] = value
-    this.setState(this.state)
+    this.setState(update(this.state, {fields: {[field]: {$set: value}}}))
   }
 
   render() {
