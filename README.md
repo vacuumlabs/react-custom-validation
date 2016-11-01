@@ -169,11 +169,9 @@ This function provides all necessary configuration for the validation library.
 
 To make the show/hide validity recommendations work properly, one also needs to
 notify the validation library about some user actions. For this purpose,
-`fieldEvent` and `connectField` props are provided to the React component which
-should be used for this purpose (see more
-[here](https://github.com/vacuumlabs/react-validation/tree/change-api#fieldevent)
-and
-[here](https://github.com/vacuumlabs/react-validation/tree/change-api#connectfieldfield-onchange-onblur)).
+`$fieldEvent` and `$field` props are provided to the React component which
+should be used for this purpose (see more [here](#fieldevent) and
+[here](#fieldfield-onchange-onblur)).
 
 In return, the validation library provides one with data on validity and
 show/hide behavior. This data is provided in two alternative ways: via
@@ -189,7 +187,7 @@ render() {
   let {
     email: {isValid: emailValid, error: {rule: emailRule, reason: emailReason}, show: emailShow}
     ...
-  } = this.props.validation
+  } = this.props.$validation
 
   return (
     <div>
@@ -248,10 +246,9 @@ javascript object with the following structure:
 ```
 
 Each rule is defined by a list of items. The first item in the list `fn` is any
-rule function (see the specification
-[here](https://github.com/vacuumlabs/validation/tree/change-api#defining-custom-rules)).
-Other items are provided to `fn` as arguments in the specified order (i.e.
-`fn(arg1, arg2, ...)` is called internally).
+rule function (see the specification [here](#defining-custom-rules)). Other
+items are provided to `fn` as arguments in the specified order (i.e. `fn(arg1,
+arg2, ...)` is called internally).
 
 Note that `fn` associated with a given rule name has to be constant (lambda
 functions are not allowed).
@@ -309,10 +306,9 @@ with full control over handling the calculated validation data.
 
 The implementation of this handler is optional and if not provided, it defaults
 to empty function. If the validation data is needed only from within the React
-form component, one can use the provided (`validation`
-prop)[https://github.com/vacuumlabs/react-validation#validation] to access the
-validation data. However, if the data is needed elsewhere in the application,
-the `onValidation` handler needs to be implemented.
+form component, one can use the provided (`$validation` prop)[#validation] to
+access the validation data. However, if the data is needed elsewhere in the
+application, the `onValidation` handler needs to be implemented.
 
 The `onValidation` handler takes in two arguments:
 - `name`: name of the corresponding validation as defined in `validations` object
@@ -351,7 +347,7 @@ onValidation: (name, data) => dispatch(
 
 #### `formValid` (optional)
 
-Validity of the whole form. This information is used to provide the `submit`
+Validity of the whole form. This information is used to provide the `$submit`
 prop.
 
 The value can be
@@ -360,11 +356,10 @@ The value can be
 - `null`: validity is unknown (some validations are pending)
 
 This field is optional; if it is not specified, `isFormValid(validation)` is
-used, where `validation` is validation data that is also provided as the
-prop `validation`[https://github.com/vacuumlabs/react-validation#validation] to
-the validated form component and `isFormValid` is a [helper
-function](https://github.com/vacuumlabs/react-validation/tree/change-api#isformvalidvalidationdata)
-for calculating overall form validity.
+used, where `validation` is validation data that is also provided as the prop
+(`$validation`)[#validation] to the validated form component and `isFormValid`
+is a [helper function](#isformvalidvalidation) for calculating overall form
+validity.
 
 #### `debounce` (optional)
 
@@ -382,9 +377,12 @@ validation results being shown only on blur or submit.
 ### Provided props
 
 The validated React component gets four new props (apart from all props that
-were passed to it) from the validation library.
+were passed to it) from the validation library. Prop names starting with `$`
+were chosen to prevent name collisions. To further ensure that these prop names
+do not collide with other prop names passed to the validated component, they
+are checked during render and error is thrown if some collision is detected.
 
-#### `submit`
+#### `$submit(onValid, onInvalid, fieldEvent = true)`
 
 It is recommended to call this function on form submit. It internally waits
 until the form validity calculation is finished and calls one of the provided
@@ -394,6 +392,10 @@ user clicks on the submit button, the `onValid` (or `onInvalid`) handler is
 called right away. Both, `onValid` and `onInvalid` arguments are optional,
 defaulting to empty functions.
 
+Since it is the desired behavior in most cases, calling `$submit` also calls
+`$fieldEvent('submit')`. This default behavior can be turned off by passing
+`false` as the third (`fieldEvent`) argument.
+
 Example of usage:
 ```
 class RegistrationForm extends React.Component {
@@ -402,7 +404,7 @@ class RegistrationForm extends React.Component {
     <form onSubmit={
       (e) => {
         e.preventDefault()
-        this.props.submit(
+        this.props.$submit(
           () => alert('Registration successful!'),
           () => alert('There are errors in the form!')
         )
@@ -413,7 +415,7 @@ class RegistrationForm extends React.Component {
 }
 ```
 
-Since invalid data submission can be easily avoided by using this `submit`
+Since invalid data submission can be easily avoided by using this `$submit`
 function, it is recommended to keep the submit button enabled while the user is
 filling out the form.
 
@@ -427,10 +429,9 @@ Note that the validation library does not prevent multiple submits while
 `onValid` handler is running; the submit button should be therefore disabled
 while the `onValid` handler is running.
 
-For information on form validity calculation see
-[here](https://github.com/vacuumlabs/react-validation/tree/change-api#formvalid-optional).
+For information on form validity calculation see [here](#formvalid-optional).
 
-#### `fieldEvent`
+#### `$fieldEvent`
 
 Handler used to notify the validation library about user actions which are used
 in show validation calculations. Takes in two arguments:
@@ -442,10 +443,10 @@ in show validation calculations. Takes in two arguments:
 The action type `'reset'` causes the validation library to "forget" all past
 field events. For example, suppose that the field `'email'` was changed, blurred
 and/or submitted and the user is not typing right now. One will thus get `{show:
-true}` for this email validation. After `fieldEvent('reset', 'email')` is
+true}` for this email validation. After `$fieldEvent('reset', 'email')` is
 called, the email field will be considered untouched (all changes, blurs,
 submits being forgotten) and one will get `{show: false}` for the email
-validation. The most usual case is perhaps calling `fieldEvent('reset')` which
+validation. The most usual case is perhaps calling `$fieldEvent('reset')` which
 is useful for resetting the whole form after successful submit.
 
 Examples of usage:
@@ -455,9 +456,9 @@ Examples of usage:
   id="email"
   onChange={(e) => {
     this.handleEmailChange(e.target.value)
-    this.props.fieldEvent('change', 'email')
+    this.props.$fieldEvent('change', 'email')
   }}
-  onBlur={() => this.props.fieldEvent('blur', 'email')}
+  onBlur={() => this.props.$fieldEvent('blur', 'email')}
   value={this.props.fields.email}
 />
 ```
@@ -466,20 +467,20 @@ Examples of usage:
 <form onSubmit={
   (e) => {
     e.preventDefault()
-    this.props.fieldEvent('submit')
+    this.props.$fieldEvent('submit')
     //...
 ```
 
-#### `connectField(field, onChange, onBlur)`
+#### `$field(field, onChange, onBlur)`
 
-Syntactic sugar that saves manual calling of the `fieldEvent` function. Takes in
+Syntactic sugar that saves manual calling of the `$fieldEvent` function. Takes in
 three arguments:
 - field name
 - `onChange` handler
 - `onBlur` handler
 
 Provides modified `onChange` and `onBlur` that take care of calling the
-`fieldEvent` function. Both handlers can be null, empty functions are then used
+`$fieldEvent` function. Both handlers can be null, empty functions are then used
 as a default.
 
 Example of usage:
@@ -487,16 +488,16 @@ Example of usage:
 <input
   type="text"
   id="email"
-  {...this.props.connectField('email', (e) => this.handleEmailChange(e.target.value))}
+  {...this.props.$field('email', (e) => this.handleEmailChange(e.target.value))}
   value={this.props.fields.email}
 />
 ```
 
-#### `validation`
+#### `$validation`
 
 If one just needs to access the validation data (validation results and
 show/hide recommendations) from within the validated form, one can read this
-data from the `validation` prop that is provided to this form. In such case one
+data from the `$validation` prop that is provided to this form. In such case one
 does not have to implement the `onValidation` handler. However, whenever the
 validation data are needed by some other react components, it is recommended to
 implement the `onValidation` instead to save the validation data to the app
@@ -507,7 +508,7 @@ Example stucture of data:
 let {
   email: {isValid, error: {reason, rule}},
   password: {...}
-} = this.props.validation
+} = this.props.$validation
 ```
 
 ### Helper Functions
