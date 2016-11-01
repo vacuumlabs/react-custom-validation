@@ -12,7 +12,7 @@
     "build": "rm -rf dist; babel lib --out-dir dist --copy-files",
     "eslint": "eslint .",
     "example": "next",
-    "prepublish": "npm run build"
+    "prepublish": "npm run eslint && npm run build"
   },
   "dependencies": {
     "bluebird": "^3.4.1",
