@@ -91,7 +91,6 @@ class Form extends React.Component {
         <button onClick={(e) => {
           e.preventDefault()
           this.props.$submit(onValid, onInvalid)
-          this.props.$fieldEvent('submit')
         }}>Sign up</button>
       </form>
     )

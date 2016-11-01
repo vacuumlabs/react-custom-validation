@@ -117,7 +117,6 @@ class Math extends React.Component {
           (e) => {
             e.preventDefault()
             let {onValid, onInvalid} = this.props
-            this.props.$fieldEvent('submit')
             this.props.$submit(onValid, onInvalid)
           }
         }
