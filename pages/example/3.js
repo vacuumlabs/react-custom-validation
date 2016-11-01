@@ -67,9 +67,9 @@ class App extends React.Component {
 class Math extends React.Component {
 
   renderSingle(id) {
-    let {problems, validation, operation, numberChange, removeProblem, connectField} = this.props
+    let {problems, $validation, operation, numberChange, removeProblem, $field} = this.props
     let {number1, number2, result} = problems[id]
-    let {isValid, error: {reason}, show} = validation[id]
+    let {isValid, error: {reason}, show} = $validation[id]
 
     let validationMessage = {
       true: 'Correct!',
@@ -87,19 +87,19 @@ class Math extends React.Component {
         <input
           type="text"
           value={number1}
-          {...connectField(`${id}-number1`, (e) => numberChange(id, 'number1', e.target.value))}
+          {...$field(`${id}-number1`, (e) => numberChange(id, 'number1', e.target.value))}
         />
         {operation.symbol}
         <input
           type="text"
           value={number2}
-          {...connectField(`${id}-number2`, (e) => numberChange(id, 'number2', e.target.value))}
+          {...$field(`${id}-number2`, (e) => numberChange(id, 'number2', e.target.value))}
         />
         =
         <input
           type="text"
           value={result}
-          {...connectField(`${id}-result`, (e) => numberChange(id, 'result', e.target.value))}
+          {...$field(`${id}-result`, (e) => numberChange(id, 'result', e.target.value))}
         />
         <button type="button" onClick={(e) => removeProblem(id)}>X</button>
         {show && <span style={style}>{validationMessage}</span>}
@@ -117,8 +117,7 @@ class Math extends React.Component {
           (e) => {
             e.preventDefault()
             let {onValid, onInvalid} = this.props
-            this.props.fieldEvent('submit')
-            this.props.submit(onValid, onInvalid)
+            this.props.$submit(onValid, onInvalid)
           }
         }
       >
