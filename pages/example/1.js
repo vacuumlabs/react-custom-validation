@@ -70,28 +70,28 @@ function validationConfig(props) {
 
 class Form extends React.Component {
   render() {
-    const {fields, onChange, onValid, onInvalid, connectField, validation} = this.props
+    const {fields, onChange, onValid, onInvalid, $field, $validation} = this.props
     return (
       <form className={style}>
         <label>Email</label>
         <input type="text" value={fields.email}
-          {...connectField('email', (e) => onChange('email', e.target.value))}/>
-        {validation.email.show && <span>{validation.email.error.reason}</span>}
+          {...$field('email', (e) => onChange('email', e.target.value))}/>
+        {$validation.email.show && <span>{$validation.email.error.reason}</span>}
 
         <label>Password</label>
         <input type="text" value={fields.password}
-          {...connectField('password', (e) => onChange('password', e.target.value))}/>
-        {validation.password.show && <span>{validation.password.error.reason}</span>}
+          {...$field('password', (e) => onChange('password', e.target.value))}/>
+        {$validation.password.show && <span>{$validation.password.error.reason}</span>}
 
         <label>Repeat password</label>
         <input type="text" value={fields.rePassword}
-          {...connectField('rePassword', (e) => onChange('rePassword', e.target.value))}/>
-        {validation.rePassword.show && <span>{validation.rePassword.error.reason}</span>}
+          {...$field('rePassword', (e) => onChange('rePassword', e.target.value))}/>
+        {$validation.rePassword.show && <span>{$validation.rePassword.error.reason}</span>}
 
         <button onClick={(e) => {
           e.preventDefault()
-          this.props.submit(onValid, onInvalid)
-          this.props.fieldEvent('submit')
+          this.props.$submit(onValid, onInvalid)
+          this.props.$fieldEvent('submit')
         }}>Sign up</button>
       </form>
     )

@@ -45,7 +45,7 @@ function validationConfig(props) {
 class Form extends React.Component {
 
   render() {
-    const {color, isOther, onChange, onValid, onInvalid, fieldEvent, connectField, validation} = this.props
+    const {color, isOther, onChange, onValid, onInvalid, $fieldEvent, $field, $validation} = this.props
     return (
       <form>
         <div>What is your favorite color?</div>
@@ -57,7 +57,7 @@ class Form extends React.Component {
                   type="radio"
                   onChange={() => {
                     onChange({color: o, isOther: false})
-                    fieldEvent('blur', 'color')
+                    $fieldEvent('blur', 'color')
                   }}
                   checked={!isOther && color === o}
                 />
@@ -72,7 +72,7 @@ class Form extends React.Component {
               type="radio"
               onChange={() => {
                 onChange({color: '', isOther: true})
-                fieldEvent('reset', 'color')
+                $fieldEvent('reset', 'color')
               }}
               checked={isOther}
             />
@@ -80,15 +80,15 @@ class Form extends React.Component {
           </label>
           {
             isOther && <input type="text" value={color}
-            {...connectField('color', (e) => onChange({color: e.target.value}))} />
+            {...$field('color', (e) => onChange({color: e.target.value}))} />
           }
         </div>
-        {validation.color.show && <div style={{color: 'red'}}>{validation.color.error.reason}</div>}
+        {$validation.color.show && <div style={{color: 'red'}}>{$validation.color.error.reason}</div>}
 
         <button onClick={(e) => {
           e.preventDefault()
-          this.props.submit(onValid, onInvalid)
-          this.props.fieldEvent('submit')
+          this.props.$submit(onValid, onInvalid)
+          this.props.$fieldEvent('submit')
         }}>Submit</button>
       </form>
     )
