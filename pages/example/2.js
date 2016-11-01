@@ -1,8 +1,4 @@
 import React from 'react'
-import Promise from 'bluebird'
-import update from 'immutability-helper'
-import validator from 'validator'
-import style from './style'
 import {validated} from '../../lib'
 
 class App extends React.Component {
@@ -29,7 +25,7 @@ const COLORS = ['White', 'Yellow', 'Fuchsia', 'Red', 'Silver', 'Gray', 'Olive',
 const OPTIONS = ['White', 'Good', 'Yellow', 'Big', 'Red', 'Blue', 'Dense', 'Pretty']
 
 const isColor = (value) =>
-  COLORS.indexOf(value) >= 0 ? null : `"${value}" is not a color. Hint: ${COLORS.join(", ")}`
+  COLORS.indexOf(value) >= 0 ? null : `"${value}" is not a color. Hint: ${COLORS.join(', ')}`
 
 function validationConfig(props) {
   const {color} = props
