@@ -33,11 +33,7 @@ function validationConfig(props) {
   return {
     fields: ['color'],
     validations: {
-      color: {
-        rules: {
-          isColor: [isColor, color],
-        }
-      },
+      color: [[isColor, color]],
     },
   }
 }
