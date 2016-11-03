@@ -47,21 +47,13 @@ function validationConfig(props) {
     fields: ['email', 'password', 'rePassword'],
 
     validations: {
-      email: {
-        rules: {
-          isEmail: [isEmail, email],
-          isUnique: [isUnique, email]
-        }
-      },
-      password: {
-        rules: {
-          minLength: [minLength, password, 6],
-        }
-      },
+      email: [
+        [isEmail, email],
+        [isUnique, email]
+      ],
+      password: [[minLength, password, 6]],
       rePassword: {
-        rules: {
-          areSame: [areSame, password, rePassword],
-        },
+        rules: [[areSame, password, rePassword]],
         fields: ['password', 'rePassword']
       }
     },

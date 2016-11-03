@@ -160,13 +160,13 @@ function validationConfig(props) {
     let {number1, number2, result} = problems[id]
     let _fields = [`${id}-number1`, `${id}-number2`, `${id}-result`]
     validations[id] = {
-      rules: {
-        isNumber1: [isNumber, number1],
-        isNumber2: [isNumber, number2],
-        isNumberResult: [isNumber, result],
-        isResultCorrect: [isResultCorrect, number1, number2, result, operation.fn]
-      },
-      fields: _fields
+      rules: [
+        [isNumber, number1],
+        [isNumber, number2],
+        [isNumber, result],
+        [isResultCorrect, number1, number2, result, operation.fn]
+      ],
+      fields: _fields,
     }
     fields = [...fields, ..._fields]
   }
