@@ -2,23 +2,52 @@ import css from 'next/css'
 
 export default css.merge(
   css({
-    width: '90%',
+    width: '50%',
+    margin: '0 auto',
+    fontFamily: 'Helvetica, Arial, sans-serif',
+    boxSizing: 'border-box',
+    textAlign: 'center',
+  }),
+  css.$(' h1', {
+    marginTop: '0',
+    color: '#444',
   }),
   css.$(' input', {
     display: 'block',
-    fontSize: '150%',
+    height: '2rem',
     width: '100%',
-    marginBottom: '0.5ex',
+    padding: '0 .5rem',
+    marginBottom: '1rem',
+    borderRadius: '.25rem',
+    border: '1px solid #ddd',
+    boxSizing: 'border-box',
+  }),
+  css.$(' input:focus', {
+    outline: 'none',
+    borderColor: '#aaa',
   }),
   css.$(' button', {
-    fontSize: '150%'
+    height: '2rem',
+    width: '5rem',
+    textTransform: 'uppercase',
+    borderRadius: '.25rem',
+    border: '0',
+    backgroundColor: '#dc0067',
+    color: 'white',
   }),
   css.$(' label', {
-    marginTop: '2ex',
-    display: 'block'
+    display: 'block',
+    color: '#444',
+    float: 'left',
+    marginBottom: '.5rem',
+    fontSize: '0.9rem',
+    paddingLeft: '.4rem',
   }),
   css.$(' span', {
-    color: 'red',
-    display: 'block'
+    color: '#d22424',
+    float: 'right',
+    display: 'block',
+    fontSize: '0.9rem',
+    paddingRight: '.4rem',
   })
 )
