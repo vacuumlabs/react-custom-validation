@@ -2,26 +2,23 @@ import css from 'next/css'
 
 export default css.merge(
   css({
-    width: '95%',
-    maxWidth: '20rem',
+    width: '100%',
     margin: '0 auto',
     fontFamily: 'Helvetica, Arial, sans-serif',
     boxSizing: 'border-box',
-    textAlign: 'center',
   }),
   css.$(' h1', {
     marginTop: '0',
     color: '#444',
   }),
-  css.$(' input', {
-    display: 'block',
+  css.$(' input[type=text]', {
     height: '2rem',
-    width: '100%',
     padding: '0 .5rem',
-    marginBottom: '1rem',
+    margin: '.5rem',
     borderRadius: '.25rem',
     border: '1px solid #ddd',
     boxSizing: 'border-box',
+    textAlign: 'center',
   }),
   css.$(' input:focus', {
     outline: 'none',
@@ -29,26 +26,30 @@ export default css.merge(
   }),
   css.$(' button', {
     height: '2rem',
-    width: '5rem',
     textTransform: 'uppercase',
     borderRadius: '.25rem',
     border: '0',
     backgroundColor: '#dc0067',
     color: 'white',
+    cursor: 'pointer',
   }),
   css.$(' label', {
-    display: 'block',
+    display: 'inline-block',
     color: '#444',
-    float: 'left',
     marginBottom: '.5rem',
+    marginRight: '1rem',
     fontSize: '0.9rem',
     paddingLeft: '.4rem',
   }),
-  css.$(' span', {
-    color: '#d22424',
-    float: 'right',
-    display: 'block',
+  css.$(' .error', {
     fontSize: '0.9rem',
-    paddingRight: '.4rem',
+    margin: '1rem auto',
+    marginLeft: '1rem',
+  }),
+  css.$(' .buttons', {
+    display: 'flex',
+  }),
+  css.$(' .buttons button', {
+    marginLeft: '.5rem',
   })
 )

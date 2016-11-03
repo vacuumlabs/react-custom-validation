@@ -2,6 +2,7 @@ import React from 'react'
 import Promise from 'bluebird'
 import update from 'immutability-helper'
 import {validated} from '../../lib'
+import style from './style3'
 
 const add = (a, b) => a + b
 const subtract = (a, b) => a - b
@@ -76,10 +77,10 @@ class Math extends React.Component {
       null: 'Computation in progress...',
       false: reason
     }[isValid]
-    let style = {
-      true: {color: 'green'},
+    let errorStyle = {
+      true: {color: '#24a224'},
       null: {},
-      false: {color: 'red'}
+      false: {color: '#d22424'}
     }[isValid]
 
     return (
@@ -101,8 +102,8 @@ class Math extends React.Component {
           value={result}
           {...$field(`${id}-result`, (e) => numberChange(id, 'result', e.target.value))}
         />
-        <button type="button" onClick={(e) => removeProblem(id)}>X</button>
-        {show && <span style={style}>{validationMessage}</span>}
+        <button type="button" onClick={(e) => removeProblem(id)}>Remove</button>
+        {show && <span className="error" style={errorStyle}>{validationMessage}</span>}
       </div>
     )
   }
@@ -113,6 +114,7 @@ class Math extends React.Component {
 
     return (
       <form
+        className={style}
         onSubmit={
           (e) => {
             e.preventDefault()
@@ -131,7 +133,7 @@ class Math extends React.Component {
           </select>
         </div>
           {problemIds.map((id) => this.renderSingle(id))}
-        <div>
+        <div className="buttons">
           <button type="button" onClick={(e) => addProblem()}> Add another </button>
           <button type="submit"> Check </button>
         </div>
