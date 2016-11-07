@@ -2,7 +2,7 @@ import React from 'react'
 import Promise from 'bluebird'
 import update from 'immutability-helper'
 import validator from 'validator'
-import style from './style'
+import style from './style1'
 import {validated} from '../../lib'
 
 class App extends React.Component {
