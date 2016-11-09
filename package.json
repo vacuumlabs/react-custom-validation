@@ -15,9 +15,8 @@
     "prepublish": "npm run eslint && npm run build"
   },
   "dependencies": {
-    "bluebird": "^3.4.1",
-    "lodash": "^4.14.1",
-    "rx": "^4.1.0"
+    "immutability-helper": "^2.0.0",
+    "lodash": "^4.14.1"
   },
   "peerDependencies": {
     "react": ">=15.0.0 <16.0.0"
@@ -30,12 +29,12 @@
     "babel-preset-react": "^6.11.1",
     "babel-preset-stage-0": "^6.5.0",
     "babelify": "^7.3.0",
+    "bluebird": "^3.4.6",
     "browserify": "^13.1.0",
     "eslint": "^3.2.2",
     "eslint-plugin-import": "^1.12.0",
-    "eslint-plugin-react": "^6.0.0",
-    "immutability-helper": "^2.0.0",
-    "next": "^1.0.0",
+    "eslint-plugin-react": "^6.6.0",
+    "next": "^1.1.1",
     "react": "^15.3.0",
     "reactify": "^1.1.1",
     "validator": "^5.5.0"
