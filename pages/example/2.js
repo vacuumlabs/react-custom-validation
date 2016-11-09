@@ -52,10 +52,7 @@ class Form extends React.Component {
               <label key={o}>
                 <input
                   type="radio"
-                  onChange={() => {
-                    onChange({color: o, isOther: false})
-                    $fieldEvent('blur', 'color')
-                  }}
+                  {...$field('color', (e) => onChange({color: o, isOther: false}), null, false)}
                   checked={!isOther && color === o}
                 />
                 {o}
