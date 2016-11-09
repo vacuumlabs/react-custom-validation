@@ -2,7 +2,7 @@ import React from 'react'
 import Promise from 'bluebird'
 import update from 'immutability-helper'
 import validator from 'validator'
-import style from './style'
+import style from './style1'
 import {validated} from '../../lib'
 
 class App extends React.Component {
@@ -65,20 +65,21 @@ class Form extends React.Component {
     const {fields, onChange, onValid, onInvalid, $field, $validation} = this.props
     return (
       <form className={style}>
+        <h1>Sign up</h1>
         <label>Email</label>
+        {$validation.email.show && <span>{$validation.email.error.reason}</span>}
         <input type="text" value={fields.email}
           {...$field('email', (e) => onChange('email', e.target.value))}/>
-        {$validation.email.show && <span>{$validation.email.error.reason}</span>}
 
         <label>Password</label>
-        <input type="text" value={fields.password}
-          {...$field('password', (e) => onChange('password', e.target.value))}/>
         {$validation.password.show && <span>{$validation.password.error.reason}</span>}
+        <input type="password" value={fields.password}
+          {...$field('password', (e) => onChange('password', e.target.value))}/>
 
         <label>Repeat password</label>
-        <input type="text" value={fields.rePassword}
-          {...$field('rePassword', (e) => onChange('rePassword', e.target.value))}/>
         {$validation.rePassword.show && <span>{$validation.rePassword.error.reason}</span>}
+        <input type="password" value={fields.rePassword}
+          {...$field('rePassword', (e) => onChange('rePassword', e.target.value))}/>
 
         <button onClick={(e) => {
           e.preventDefault()

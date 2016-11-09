@@ -1,5 +1,6 @@
 import React from 'react'
 import {validated} from '../../lib'
+import style from './style2'
 
 class App extends React.Component {
   state = {isOther: false, color: null}
@@ -43,12 +44,12 @@ class Form extends React.Component {
   render() {
     const {color, isOther, onChange, onValid, onInvalid, $fieldEvent, $field, $validation} = this.props
     return (
-      <form>
-        <div>What is your favorite color?</div>
-        {
-          OPTIONS.map((o) => (
-            <div key={o}>
-              <label>
+      <form className={style}>
+        <h1>What is your favorite color?</h1>
+        <div>
+          {
+            OPTIONS.map((o) => (
+              <label key={o}>
                 <input
                   type="radio"
                   onChange={() => {
@@ -59,10 +60,8 @@ class Form extends React.Component {
                 />
                 {o}
               </label>
-            </div>
-          ))
-        }
-        <div>
+            ))
+          }
           <label>
             <input
               type="radio"
@@ -79,12 +78,13 @@ class Form extends React.Component {
             {...$field('color', (e) => onChange({color: e.target.value}))} />
           }
         </div>
-        {$validation.color.show && <div style={{color: 'red'}}>{$validation.color.error.reason}</div>}
-
-        <button onClick={(e) => {
-          e.preventDefault()
-          this.props.$submit(onValid, onInvalid)
-        }}>Submit</button>
+        {$validation.color.show && <div className="error">{$validation.color.error.reason}</div>}
+        <div>
+          <button onClick={(e) => {
+            e.preventDefault()
+            this.props.$submit(onValid, onInvalid)
+          }}>Submit</button>
+        </div>
       </form>
     )
   }
