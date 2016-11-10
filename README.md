@@ -74,11 +74,11 @@ even when the requirements are more complex (e.g. when one wants to dynamically
 add and remove fields). The user is encouraged to review the code of example 3
 if they want to create more complex validated forms.
 
-## Basic Usage
+## Example
 
 Let us start with a simple registration form that contains three validated
-fields: email, password and repeated password. The corresponding React component
-code without validations could be as follows:
+fields: email, password and repeated password. The corresponding code without
+validations can look as follows:
 
 ```javascript
 class RegistrationForm extends React.Component {
@@ -87,7 +87,7 @@ class RegistrationForm extends React.Component {
     let {
       fields: {email, password, rePassword}
       changeEmail,
-      // ...
+      ...
     } = this.props
 
     return (
@@ -110,53 +110,20 @@ that calculates validation config from component's props:
 
 ```javascript
 function validationConfig(props) {
-  let {
-    // Key-value pairs of validated fields
-    fields: {email, password, rePassword},
-    // Function (name, data) => {...} used to handle data provided by
-    // validation library
-    onValidation,
-  } = props
+  let {fields: {email, password, rePassword}} = props
 
   return {
-    // Names of all validated form fields
     fields: ['email', 'password', 'rePassword'],
-    // Specify what should happen when new validation data is available.
-    // For example, redux action creator, that will save the validation result
-    // to the application state
-    onValidation,
-    // Configure the validations itself. Here we specify 3 validations, each
-    // with different validation rules
     validations: {
-      email: {
-        rules: {
-          // Lisp-like convention, first item in the list is function, all other
-          // items are arguments. Note that the function has to be constant
-          // (lambda functions are not allowed)
-          isRequired: [isRequired, email],
-          isEmail: [isEmail, email],
-          isUnique: [isUnique, email, {time: 1000}]
-        },
-      },
-      password: {
-        rules: {
-          isRequired: [isRequired, password],
-          hasLength: [hasLength, password, {min: 6, max: 10}],
-          hasNumber: [hasNumber, password],
-        },
-      },
-      passwordsMatch: {
-        rules: {
-          areSame: [areSame, password, rePassword]
-        },
-        // Names of fields validated by this validation. Validation library uses
-        // this to determine which field changes, blurs and submits have to be
-        // tracked and then uses this data to calculate validation-showing info.
-        // If not provided, the validation name (i.e. the key in this object) is
-        // used.  For example, ['email'] and ['password'] are used for the email
-        // and password validations above, respectively
-        fields: ['password', 'rePassword'],
-      },
+      email: [
+        [isEmail, email], // [function, ...args]
+        [isUnique, email]
+      ],
+      password: [[minLength, password, 6]],
+      rePassword: {
+        rules: [[areSame, password, rePassword]],
+        fields: ['password', 'rePassword']
+      }
     },
   }
 }
@@ -165,29 +132,58 @@ function validationConfig(props) {
 class Registration extends React.Component {
 ...
 ```
-This function provides all necessary configuration for the validation library.
 
 To make the show/hide validity recommendations work properly, one also needs to
-notify the validation library about some user actions. For this purpose,
-`$fieldEvent` and `$field` props are provided to the React component which
-should be used for this purpose (see more [here](#fieldevent) and
-[here](#fieldfield-onchange-onblur)).
+notify the validation library about some user actions (changes, blurs, submits).
+This can be easily done by using a provided helper function `$field`:
 
-In return, the validation library provides one with data on validity and
-show/hide behavior. This data is provided in two alternative ways: via
-`onValidation` handler (so that they can be handled in any desired way - e.g.
-dispatched to the app state) and as `props` to the React component (can save
-some code if the validation data is needed only in that component).
+```javascript
+@validated(validationConfig)
+class RegistrationForm extends React.Component {
 
-The data can then be used in the `render` function in any desired way, for
-example:
+  render() {
+    let {
+      fields: {email, password, rePassword}
+      $field,
+      changeEmail,
+      ...
+    } = this.props
+
+    return (
+      <form>
+        <input
+          type="text"
+          id="email"
+          {...$field('email', (e) => changeEmail(e.target.value))}
+          value={email}
+        />
+        { /* similar code for password and re-password inputs */ }
+      </form>
+    )
+  }
+}
+```
+
+In return, the validation library provides data on validity and show/hide
+behavior as the prop `$validation`. (If needed, one can also specify
+`onValidation` handler that will be called whenever new validation data is
+available. This takes some more coding, but provides full flexibility regarding
+validation data handling.)
+
 ```javascript
 render() {
-  // validation data provided as props by the validated decorator
   let {
-    email: {isValid: emailValid, error: {rule: emailRule, reason: emailReason}, show: emailShow}
     ...
-  } = this.props.$validation
+    // validation data provided as props by the validated decorator
+    $validation: {
+      email: {
+        isValid: emailValid,
+        error: {rule: emailRule, reason: emailReason},
+        show: emailShow
+      },
+      ...
+    }
+  } = this.props
 
   return (
     <div>
@@ -199,16 +195,12 @@ render() {
 }
 ```
 
-### Multiple-field validation
+Note that multiple-field validations (such as `passwordsMatch`) are very easy to
+specify. Apart from absolutely straighforward definition of rules, one just
+needs to provide the list of all fields involved in the validation, so that
+correct show/hide recommendations can be given.
 
-It is extremely easy to validate multiple fields. For example, see the
-`passwordsMatch` validation above. Note that you have to specify all fields that
-the validation depends on. This is used to provide correct show/hide
-recommendations (we want to show the result only if all fields have been touched
-already).
-
-
-## API
+## API Documentation
 
 ### `validationConfig(props)`
 
@@ -218,83 +210,91 @@ config, which is a plain javascript object containing the keys specified below.
 
 #### `validations`
 
-The most important part of the config is an object containing key-value pairs of
-all validations. The key serves as an identifier for the validation and is
-referred to as validation `name` throughout this documentation. Each value is a
-javascript object with the following structure:
-```
-{
-  rules: {
-    ruleName: [ // used as an identifier for this rule
-      fn, // first item in the list is the rule function, see below
-      arg1, // first argument for `fn`
-      arg2, // second argument for `fn`
-      ...
+Object that maps validation names to validation rules and fields. The keys serve
+as identifiers for the validations and will be referred to as `validationName`s
+in this documentation. For example:
+```javascript
+validations: {
+  email: {
+    rules: [
+      ['isEmail', isEmail, email],
+      ['isUnique', isUnique, email]
     ],
-    anotherRuleName: [
-      //...
-    ],
-    ...
+    fields: [['email'], ['email']]
   },
-  // Field(s) validated by this validation; optional.
-  // Validation library uses this to determine which field changes, blurs and
-  // submits have to be tracked and then uses this data to calculate
-  // validation-showing info. If not provided, the validation name (i.e. the key
-  // in this object) is used.
-  fields: String | Array(Strings),
+  ...
 }
 ```
 
-Each rule is defined by a list of items. The first item in the list `fn` is any
-rule function (see the specification [here](#defining-custom-rules)). Other
-items are provided to `fn` as arguments in the specified order (i.e. `fn(arg1,
-arg2, ...)` is called internally).
-
-Note that `fn` associated with a given rule name has to be constant (lambda
-functions are not allowed).
-
-Example of usage:
-```
+If the optional `fields` part is not provided, one can specify the `rules`
+directly (top-level):
+```javascript
 validations: {
-  email: {
-    rules: {
-      isRequired: [isRequired, email],
-      isEmail: [isEmail, email],
-      isUnique: [isUnique, email, {time: 1000}]
-    },
-  },
-  password: {
-    rules: {
-      isRequired: [isRequired, password],
-      hasLength: [hasLength, password, {min: 6, max: 10}],
-      hasNumber: [hasNumber, password],
-    },
-  },
-  passwordsMatch: {
-    rules: {
-      areSame: [areSame, password, rePassword]
-    },
-    fields: ['password', 'rePassword'],
-  },
+  email: [
+    ['isEmail', isEmail, email],
+    ['isUnique', isUnique, email]
+  ],
+  ...
+}
 ```
+
+##### `validations.rules`
+
+List of function-call descriptors in the form
+```javascript
+[string, fn, arg1, arg2, ...] // rule name, rule function, args
+```
+
+The first item (rule name) is optional. It is used to specify the failed rule in
+the validation result; if ommitted, the rule function name is used.
+```javascript
+[fn, arg1, arg2, ...]
+```
+
+The next item `fn` can be any function that complies with the [rule function
+API](#defining-custom-rules). All other items are provided to this function as
+arguments in the specified order (i.e. `fn(arg1, arg2, ...)` is called
+internally).
+
+:exclamation: *Using lambda functions as `fn` leads to infinite loop in
+validation calculations in some cases. It is best to avoid them completely and
+use named functions instead.*
+
+:thumbsup: *Rule ordering matters, put sync rules first! The rules are evaluated
+in the order they were specified, and if a rule synchronously returns an invalid
+result, the later rules are not evaluated at all. This can save a lot of useless
+server requests.*
+
+##### `validations.fields` (optional)
+
+Fields validated by this validation in the form
+```javascript
+[dependsOn, needTouch]
+```
+
+Both `dependsOn` and `needTouch` are Arrays of field names (strings). These data
+are used to calculate show/hide recommendations.
+
+`dependsOn` should list all user-input fields that influence the validation
+result. Validation library tracks whether user is typing in any of these fields
+and if so, it recommends to hide the corresponding validation result.
+
+`needTouch` should list all user-input fields that need to be touched (changed,
+blurred, submitted) before the validation result can be shown.
+
+In most cases, both fields look the same, and contain one item, the name of the
+validated field. Therefore, the following defaults are provided:
+
+* `null` and `undefined` resolve to `[[validationName], [validationName]]` (e.g.
+  (`[['email'], ['email']]`)
+* `someString` resolves to `[[someString], [someString]]`
+* `someArray` resolves to `[someArray, someArray]`
 
 #### `fields`
 
-List of all field names that require validation, for example:
-
-```
-  fields: ['email', 'password', 'rePassword']
-```
-
-
-For convenience reasons, object with field names as keys is also accepted:
-
-```
-  fields: {
-    email: 'my.email@example.com',
-    password: 'verysecret123',
-    rePassword: 'verysecr',
-  }
+Array of all field names (strings) that require validation, for example:
+```javascript
+fields: ['email', 'password', 'rePassword']
 ```
 
 #### `onValidation` (optional)
@@ -305,13 +305,14 @@ these validation results) is available. It provides the application developer
 with full control over handling the calculated validation data.
 
 The implementation of this handler is optional and if not provided, it defaults
-to empty function. If the validation data is needed only from within the React
-form component, one can use the provided (`$validation` prop)[#validation] to
-access the validation data. However, if the data is needed elsewhere in the
-application, the `onValidation` handler needs to be implemented.
+to empty function. If the validation data is needed only from within the
+validated React component, one can use the provided prop `$validation` to access
+this data. However, if the data is needed elsewhere in the application (e.g. by
+some other React components), the `onValidation` handler needs to be
+implemented.
 
 The `onValidation` handler takes in two arguments:
-- `name`: name of the corresponding validation as defined in `validations` object
+- `validationName`: name of the corresponding validation as defined in `validations` part of config
 - `data`: newly calculated validation data; javascript object with the following structure
 
 ```
@@ -320,9 +321,9 @@ The `onValidation` handler takes in two arguments:
   isValid: true | false | null
   error: {
     // name of the rule that failed
-    rule: null | String
+    rule: undefined | String
     // data returned by the rule function providing more specific info on error
-    reason: null | any javascipt object
+    reason: undefined | any javascipt object
   },
   // whether the validation result should be displayed to the user
   show: true | false
@@ -333,15 +334,12 @@ Note that `rule` and `reason` are not undefined only if `isValid` is `false`.
 
 The recommended implementation of the `onValidation` handler should simply save
 the provided data in the application state so that they can be accessed there
-from the `render` method when needed. Example:
-```
-onValidation: (name, data) => dispatch(
-  // We dispatch a function that defines how app state should be modified
-  fn: (state) => {
-    // create new state with updated validation data, while keeping the old state the same
-    return ramda.assocPath(['validations', name], data, state)
-  },
-  description: `Got data for ${name} validation: ${JSON.stringify(data)}`
+when needed. Example:
+```javascript
+onValidation: (validationName, data) => dispatch(
+  // Here we dispatch a function that defines how app state should be modified
+  // using update from immutability-helper library
+  (state) => update(state, {validations: {[validationName]: {$set: data}}})
 )
 ```
 
@@ -355,32 +353,42 @@ The value can be
 - `false`: at least one field is invalid
 - `null`: validity is unknown (some validations are pending)
 
-This field is optional; if it is not specified, `isFormValid(validation)` is
-used, where `validation` is validation data that is also provided as the prop
-(`$validation`)[#validation] to the validated form component and `isFormValid`
-is a [helper function](#isformvalidvalidation) for calculating overall form
-validity.
+This field is optional; if it is not specified, `isFormValid($validation)` is
+used, where `$validation` is validation data that is also provided as the prop
+`$validation` to the validated form component and `isFormValid` is a [helper
+function](#isformvalidvalidation) for calculating overall form validity.
 
 #### `debounce` (optional)
 
-Throttling for validity computations, in milliseconds. If not specified, default
-value of 100 is used.
+Object containing three keys that configure different aspects of the library.
 
-#### `typingDebounce` (optional)
+* `calculation` sets throttling for validity computations
+* `typing` and `typingAfterBlur` specify time to wait after last user's type
+  before validation result is shown, before and after (respectively) the field
+  is blurred or submitted for the first time
 
-Time to wait after last user's type before validation is shown, in milliseconds.
-If not specified, default value of 1000 is used.
+All debounces are in milliseconds and all are optional. If not specified, the
+following default values are used:
+```javascript
+{
+  calculation: 100,
+  typing: 2500,
+  typingAfterBlur: 1000
+}
+```
 
-Note that setting this option to infinite (very long) time will result in the
-validation results being shown only on blur or submit.
+:thumbsup: *Note that setting `typing` and `typingAfterBlur` to infinite (very
+long) time will result in the validation results being shown only on blur or
+submit.*
 
 ### Provided props
 
-The validated React component gets four new props (apart from all props that
-were passed to it) from the validation library. Prop names starting with `$`
-were chosen to prevent name collisions. To further ensure that these prop names
-do not collide with other prop names passed to the validated component, they
-are checked during render and error is thrown if some collision is detected.
+The validated React component gets four new props (apart from all other props
+that were passed to it) from the validation library. Prop names starting with
+`$` were chosen to prevent name collisions. To further ensure that these prop
+names do not collide with other prop names passed to the validated component,
+they are checked during render and error is thrown if some collision is
+detected.
 
 #### `$submit(onValid, onInvalid, fieldEvent = true)`
 
@@ -431,23 +439,32 @@ while the `onValid` handler is running.
 
 For information on form validity calculation see [here](#formvalid-optional).
 
-#### `$fieldEvent`
+#### `$fieldEvent(event, field, debounce)`
 
 Handler used to notify the validation library about user actions which are used
-in show validation calculations. Takes in two arguments:
-- `type`: `'blur'` or `'change'` or `'submit'` or `'reset'`
-- `field`: `String`, field name as referred to in `fields` in the validation
-  config; if not specified (usually for `'submit'` and `'reset`' events), all
-  fields specified in validation config are assumed
+in show/hide validation calculations. Takes in the following arguments:
+- `event`: `'blur'` or `'change'` or `'submit'` or `'reset'`
+- `field` (optional): string, one of field names specified in `fields` part of
+  the validation config
+- `debounce` (optional): `true` or `false` or number or `null`; overrides
+  typing debounces set in validation config; only available for `'change'`
+  events
 
-The action type `'reset'` causes the validation library to "forget" all past
+The event `'reset'` causes the validation library to "forget" all past
 field events. For example, suppose that the field `'email'` was changed, blurred
-and/or submitted and the user is not typing right now. One will thus get `{show:
-true}` for this email validation. After `$fieldEvent('reset', 'email')` is
-called, the email field will be considered untouched (all changes, blurs,
+and/or submitted and the user is not typing right now. One will thus get
+`{show: true}` for this email validation. After `$fieldEvent('reset', 'email')`
+is called, the email field will be considered untouched (all changes, blurs,
 submits being forgotten) and one will get `{show: false}` for the email
 validation. The most usual case is perhaps calling `$fieldEvent('reset')` which
-is useful for resetting the whole form after successful submit.
+is useful for resetting all recorded field data (for example, after successful
+submit).
+
+If `field` is not specified, all fields specified in the `fields` part of the
+validation config are assumed. This is useful especially for the `'submit`'
+event. Note that `$fieldEvent('reset')` is an exception; it resets all the
+recorded field events (even for fields that are not specified in the validation
+config).
 
 Examples of usage:
 ```
@@ -468,23 +485,24 @@ Examples of usage:
   (e) => {
     e.preventDefault()
     this.props.$fieldEvent('submit')
-    //...
+    ...
 ```
 
-#### `$field(field, onChange, onBlur)`
+#### `$field(field, onChange, onBlur, debounce)`
 
 Syntactic sugar that saves manual calling of the `$fieldEvent` function. Takes in
-three arguments:
+the following arguments:
 - field name
 - `onChange` handler
 - `onBlur` handler
+- debounce
 
 Provides modified `onChange` and `onBlur` that take care of calling the
 `$fieldEvent` function. Both handlers can be null, empty functions are then used
 as a default.
 
-Example of usage:
-```
+Examples of usage:
+```javascript
 <input
   type="text"
   id="email"
@@ -493,31 +511,43 @@ Example of usage:
 />
 ```
 
+```javascript
+<input
+  type="checkbox"
+  id="isOther"
+  {...this.props.$field(
+    'isOther',
+    (e) => this.handleIsOtherChange(e.target.value), // onChange
+    null, // onBlur
+    false // we do not want typing debounce for a checkbox
+  )}
+  checked={this.props.fields.isOther}
+/>
+```
+
 #### `$validation`
 
-If one just needs to access the validation data (validation results and
-show/hide recommendations) from within the validated form, one can read this
-data from the `$validation` prop that is provided to this form. In such case one
-does not have to implement the `onValidation` handler. However, whenever the
-validation data are needed by some other react components, it is recommended to
-implement the `onValidation` instead to save the validation data to the app
-state, where the data can be used by any part of the application.
+Object that maps each `validationName` specified in the `validations` part of the
+config to the corresponding validation result and show/hide recommendation.
 
-Example stucture of data:
+The data structure is the same as what is provided by the `onValidation`
+handler. For example:
 ```
 let {
-  email: {isValid, error: {reason, rule}},
-  password: {...}
-} = this.props.$validation
+  $validation: {
+    email: {isValid, error: {reason, rule}},
+    password: {...}
+  }
+} = this.props
 ```
 
 ### Helper Functions
 
-#### `isFormValid(validation)`
+#### `isFormValid($validation)`
 
 Returns validity of multiple validation results. The result is false if any
 single validation contains valid = false, null if any validation contains valid
-= null (and none is false) and true otherwise. The argument `validation` should
+= null (and none is false) and true otherwise. The argument `$validation` should
 be a dict of validation results as provided by the validation library.
 
 #### `initValidation()`
@@ -529,16 +559,18 @@ the validation data in the app state structured in the same way.
 
 ## Defining Custom Rules
 
-Rules are ordinary javascript functions, so it is extremely easy to add new
-rules.
+It is very easy to create new rule functions. The rule function is any function
+that:
+- returns a *valid value* or a `Promise` that resolves to a valid value if the
+  arguments satify the rule
+- returns an error description (not equal to any valid value) or a `Promise` of
+  such error description if the arguments do not satisfy the rule
 
-The rule function can be any function that:
-- returns `null` or a `Promise` that resolves to `null` if the arguments satisfy
-  the rule
-- returns some error description (`!= null`) or a `Promise` of such error
-  description if the arguments do not satisfy the rule
+The *valid values* are `null`, `undefined`, `true`, `[]` and `{}`. This
+convention enables one to use functions provided by some popular javascript
+validation libraries without any additional boilerplate code.
 
-For example:
+Examples:
 
 ```javascript
 function areSame({value1, value2}) {
@@ -551,9 +583,6 @@ function isUnique({value}) {
   return Promise.delay(10).then(() => response)
 }
 ```
-
-To write a custom rule, you just need to implement the function and use it in
-your validation config.
 
 ### Custom messages and internationalization
 
