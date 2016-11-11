@@ -1,5 +1,5 @@
 import React from 'react'
-import {validated} from '../../lib'
+import {validated, isFormValid} from '../../lib'
 import style from './style2'
 
 class App extends React.Component {
@@ -79,7 +79,11 @@ class Form extends React.Component {
         <div>
           <button onClick={(e) => {
             e.preventDefault()
-            this.props.$submit(onValid, onInvalid)
+            if (isFormValid($validation)) {
+              onValid()
+            } else {
+              onInvalid()
+            }
           }}>Submit</button>
         </div>
       </form>

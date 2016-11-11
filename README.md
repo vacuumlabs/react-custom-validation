@@ -439,6 +439,11 @@ while the `onValid` handler is running.
 
 For information on form validity calculation see [here](#formvalid-optional).
 
+:thumbsup: *If no async validations are used, the form validity is always known
+(it never equals `null`). In such a case, one can simply use
+`isFormValid($validity)` instead of `$submit` to find out form validity at
+submit (see code in example 2).*
+
 #### `$fieldEvent(event, field, debounce)`
 
 Handler used to notify the validation library about user actions which are used
