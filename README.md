@@ -4,6 +4,10 @@ Client-side validation library that aims for the excellent user experience. Do
 not expect cheap magic here; we will force you to write some amount of code.
 It is the only way how to do really great validations.
 
+:exclamation: *Warning: There were some API changes since version 0.4.5, but the
+major version was not increased by accident. The versions 0.4.6 and 0.4.7.
+should have been 0.5.x. Sorry for this issue.*
+
 ## Rationale
 
 With React and proper application state management system (for example, Redux)

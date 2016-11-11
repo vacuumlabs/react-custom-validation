@@ -1,6 +1,6 @@
 {
   "name": "react-custom-validation",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "description": "Form validation with customizable rules",
   "main": "dist/index.js",
   "license": "MIT",
