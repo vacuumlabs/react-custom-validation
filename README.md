@@ -362,22 +362,26 @@ function](#isformvalidvalidation) for calculating overall form validity.
 
 Object containing three keys that configure different aspects of the library.
 
-* `calculation` sets throttling for validity computations
-* `typing` and `typingAfterBlur` specify time to wait after last user's type
-  before validation result is shown, before and after (respectively) the field
-  is blurred or submitted for the first time
+* `asyncRules` sets throttling for async validity computations
+* `typing` specifies the time to wait after last user's type before validation
+  result is shown
+* `typingSecondVisit` Usually, when user enters the field for the second time
+  (typically to correct the value), you may want to lower the `typing` debounce
+  so that the feedback is more immediate. Therefore, the debounce value for the
+  second (and all subsequent) visit of the field is stored in this separate
+  setting
 
 All debounces are in milliseconds and all are optional. If not specified, the
 following default values are used:
 ```javascript
 {
-  calculation: 100,
+  asyncRules: 100,
   typing: 2500,
-  typingAfterBlur: 1000
+  typingSecondVisit: 1000
 }
 ```
 
-:thumbsup: *Note that setting `typing` and `typingAfterBlur` to infinite (very
+:thumbsup: *Note that setting `typing` and `typingSecondVisit` to infinite (very
 long) time will result in the validation results being shown only on blur or
 submit.*
 
