@@ -361,32 +361,32 @@ used, where `$validation` is validation data that is also provided as the prop
 `$validation` to the validated form component and `isFormValid` is a [helper
 function](#isformvalidvalidation) for calculating overall form validity.
 
-#### `debounce` (optional)
+#### `options` (optional)
 
-Object containing three keys that configure different aspects of the library.
+Object that further configures the validation library.
 
-* `asyncRules` sets throttling for async validity computations
-* `typing` specifies the time to wait after last user's type before validation
-  result is shown
-* `typingSecondVisit` Usually, when user enters the field for the second time
-  (typically to correct the value), you may want to lower the `typing` debounce
-  so that the feedback is more immediate. Therefore, the debounce value for the
-  second (and all subsequent) visit of the field is stored in this separate
-  setting
+* `asyncThrottle` sets throttling for async validity computations; number
+  (milliseconds)
+* `typingDebounce` specifies the time to wait after last user's type before
+  validation result is shown. Allowed values are:
+    - number (millisecons)
+    - `[number1, number2]` When user enters the field for the second time
+      (typically to correct the value), you may want to lower the typing
+      debounce so that the feedback is more immediate. Therefore, you can
+      specify two typing debounces: `number1` will be used on the first visit of
+      the field and `number2` on the second and all subsequent visits of the
+      field
 
-All debounces are in milliseconds and all are optional. If not specified, the
-following default values are used:
+If some of the options is not specified, the following default values are used:
 ```javascript
 {
-  asyncRules: 500,
-  typing: 2500,
-  typingSecondVisit: 1000
+  asyncThrottle: 500,
+  typingDebounce: [2500, 1000]
 }
 ```
 
-:thumbsup: *Note that setting `typing` and `typingSecondVisit` to infinite (very
-long) time will result in the validation results being shown only on blur or
-submit.*
+:thumbsup: *Note that setting `typingDebounce` to infinite (very long) time will
+result in the validation results being shown only on blur or submit.*
 
 ### Provided props
 
@@ -459,7 +459,7 @@ in show/hide validation calculations. Takes in the following arguments:
 - `field` (optional): string, one of field names specified in `fields` part of
   the validation config
 - `debounce` (optional): `true` or `false` or number or `null`; overrides
-  typing debounces set in validation config; only available for `'change'`
+  typing debounce set in validation config; only available for `'change'`
   events
 
 The event `'reset'` causes the validation library to "forget" all past
@@ -507,7 +507,9 @@ the following arguments:
 - field name
 - `onChange` handler
 - `onBlur` handler
-- debounce
+- `debounce` (optional): `true` or `false` or number or `null`; overrides
+  typing debounce set in validation config for the `'change'` fieldEvent; does
+  not affect `'blur`' field event. Default value is `'true'`
 
 Provides modified `onChange` and `onBlur` that take care of calling the
 `$fieldEvent` function. Both handlers can be null, empty functions are then used
