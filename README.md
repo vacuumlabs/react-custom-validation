@@ -375,7 +375,7 @@ All debounces are in milliseconds and all are optional. If not specified, the
 following default values are used:
 ```javascript
 {
-  asyncRules: 100,
+  asyncRules: 500,
   typing: 2500,
   typingSecondVisit: 1000
 }
