@@ -125,7 +125,12 @@ function validationConfig(props) {
       password: [[minLength, password, 6]],
       rePassword: {
         rules: [[areSame, password, rePassword]],
-        fields: ['password', 'rePassword']
+        fields: [
+          // hide validation result if user is typing in one of these fields
+          ['password', 'rePassword'],
+          // hide validation result until user touched all of these fields
+          ['rePassword']
+        ]
       }
     },
   }
