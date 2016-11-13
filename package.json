@@ -1,7 +1,7 @@
 {
   "name": "react-custom-validation",
   "version": "0.5.0",
-  "description": "Form validation with customizable rules",
+  "description": "React form validation library. Great UX, lot of flexibility.",
   "main": "dist/index.js",
   "license": "MIT",
   "repository": {

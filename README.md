@@ -1,59 +1,9 @@
 # React Validation Library
 
 Client-side validation library that aims for the excellent user experience. Do
-not expect cheap magic here; we will force you to write some amount of code.
-It is the only way how to do really great validations.
-
-## Rationale
-
-With React and proper application state management system (for example, Redux)
-it is simple to validate things. All the data is available in the application
-state, hence obtaining the validity is as easy as applying validation functions
-to the appropriate arguments. Multiple-field validations and asynchronous
-validations do not complicate the story much.
-
-The real challenge for top-notch validated component is not computing actual
-validity of individual fields, but computing whether the validation result
-should be shown to the user. We strongly believe that these two aspects are
-completely orthogonal and should be treated so. Required field never touched?
-Invalid, but do not show it. Email field does not look e-mail-ish at all?
-Invalid, but do not show it if the user is still typing. If the user changes the
-focus to another field, show it ASAP! You see the picture.
-
-It turns out that whether the validation result should be presented to the user
-depends on many details: what inputs were already touched, when the last
-keystroke happened, whether the user already attempted to submit the form, etc.
-Such details are 100% unimportant for anything else than showing validation
-result, so you do not capture and store these data in any way. Therefore, the
-validation library creates a higher order component (HOC) that stores this
-information in its internal component state.
-
-The contract is simple:
-
-- you configure what validation rules exist and what fields affect what validations
-- you inform the validation component about all changes, blurs and submits
-  performed by the user
-- validation component informs you what is the status of each individual
-  validation: Whether the validation is OK / not OK and whether you should /
-  should not display validation status
-
-## Feature set
-
-- Automatic re-calculation of validity when user changes the input value
-- Suggestions on showing/hiding the validation result
-  - Hide validity while the user is typing
-  - Hide validity if the field was not touched yet
-  - Show validity if the user finished typing
-- Easy definition and usage of custom validation rules
-- Multiple fields validation
-- Async validations
-- Debouncing / Throttling
-- Conditional validations
-- Flexibility and extensibility: can be easily combined with other validation approaches
-
-This library is intended to be used with React. It also plays well with Redux,
-but it can be used without Redux as well. It can be easily integrated with
-React-Intl or other (custom?) i18n solution.
+not expect cheap magic here; we will force you to write some amount of code. In
+return, you get a lot of flexibility and customizability (if you want it); and of
+course, really great user experience with your validated forms.
 
 ## Try it out
 
@@ -207,6 +157,57 @@ Note that multiple-field validations (such as `passwordsMatch`) are very easy to
 specify. Apart from absolutely straighforward definition of rules, one just
 needs to provide the list of all fields involved in the validation, so that
 correct show/hide recommendations can be given.
+
+## Rationale
+
+With React and proper application state management system (for example, Redux)
+it is simple to validate things. All the data is available in the application
+state, hence obtaining the validity is as easy as applying validation functions
+to the appropriate arguments. Multiple-field validations and asynchronous
+validations do not complicate the story much.
+
+The real challenge for top-notch validated component is not computing actual
+validity of individual fields, but computing whether the validation result
+should be shown to the user. We strongly believe that these two aspects are
+completely orthogonal and should be treated so. Required field never touched?
+Invalid, but do not show it. Email field does not look e-mail-ish at all?
+Invalid, but do not show it if the user is still typing. If the user changes the
+focus to another field, show it ASAP! You see the picture.
+
+It turns out that whether the validation result should be presented to the user
+depends on many details: what inputs were already touched, when the last
+keystroke happened, whether the user already attempted to submit the form, etc.
+Such details are 100% unimportant for anything else than showing validation
+result, so you do not capture and store these data in any way. Therefore, the
+validation library creates a higher order component (HOC) that stores this
+information in its internal component state.
+
+The contract is simple:
+
+- you configure what validation rules exist and what fields affect what validations
+- you inform the validation component about all changes, blurs and submits
+  performed by the user
+- validation component informs you what is the status of each individual
+  validation: Whether the validation is OK / not OK and whether you should /
+  should not display validation status
+
+## Feature set
+
+- Automatic re-calculation of validity when user changes the input value
+- Suggestions on showing/hiding the validation result
+  - Hide validity while the user is typing
+  - Hide validity if the field was not touched yet
+  - Show validity if the user finished typing
+- Easy definition and usage of custom validation rules
+- Multiple fields validation
+- Async validations
+- Debouncing / Throttling
+- Conditional validations
+- Flexibility and extensibility: can be easily combined with other validation approaches
+
+This library is intended to be used with React. It also plays well with Redux,
+but it can be used without Redux as well. It can be easily integrated with
+React-Intl or other (custom?) i18n solution.
 
 ## API Documentation
 
