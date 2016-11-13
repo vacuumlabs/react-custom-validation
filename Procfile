@@ -1,1 +1,1 @@
-web: npm run example
+web: cd examples; npm install; npm run example
