@@ -13,7 +13,8 @@
     "eslint": "eslint .",
     "example": "next -p ${PORT:-3000}",
     "prepublish": "npm run eslint && npm run build",
-    "start": "next -p ${PORT:-3000}"
+    "start": "next -p ${PORT:-3000}",
+    "watch": "rm -rf dist; babel lib --out-dir dist --copy-files --watch"
   },
   "dependencies": {
     "immutability-helper": "^2.0.0",
