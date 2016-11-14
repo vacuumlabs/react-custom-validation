@@ -13,7 +13,7 @@ function example(req, res) {
         <title>React Validation Examples</title>
         <script async defer type="text/javascript" src="/bundle.js"> </script>
       </head>
-      <body> <div id='app'/> </body>
+      <body style="margin: 0;"> <div id='app'/> </body>
     </html>
   `)
 }
