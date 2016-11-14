@@ -26,7 +26,7 @@ class Menu extends React.Component {
     return (
       <div>
         <div style={navStyle}>
-          <h1 style={h1Style}>react-validation</h1>
+          <h1 style={h1Style}>react-custom-validation</h1>
           <Link to="/example1" style={linkStyle}>Example 1</Link>
           <Link to="/example2" style={linkStyle}>Example 2</Link>
           <Link to="/example3" style={linkStyle}>Example 3</Link>
