@@ -11,9 +11,7 @@
   "scripts": {
     "build": "rm -rf dist; babel lib --out-dir dist --copy-files",
     "eslint": "eslint .",
-    "example": "next -p ${PORT:-3000}",
     "prepublish": "npm run eslint && npm run build",
-    "start": "next -p ${PORT:-3000}",
     "watch": "rm -rf dist; babel lib --out-dir dist --copy-files --watch"
   },
   "dependencies": {
