@@ -1,7 +1,7 @@
-import css from 'next/css'
+import {style, merge, $} from 'glamor'
 
-export default css.merge(
-  css({
+export default merge(
+  style({
     width: '95%',
     maxWidth: '20rem',
     margin: '0 auto',
@@ -9,11 +9,11 @@ export default css.merge(
     boxSizing: 'border-box',
     textAlign: 'center',
   }),
-  css.$(' h1', {
+  $(' h1', {
     marginTop: '0',
     color: '#444',
   }),
-  css.$(' input', {
+  $(' input', {
     display: 'block',
     height: '2rem',
     width: '100%',
@@ -23,11 +23,11 @@ export default css.merge(
     border: '1px solid #ddd',
     boxSizing: 'border-box',
   }),
-  css.$(' input:focus', {
+  $(' input:focus', {
     outline: 'none',
     borderColor: '#aaa',
   }),
-  css.$(' button', {
+  $(' button', {
     height: '2rem',
     width: '5rem',
     textTransform: 'uppercase',
@@ -36,7 +36,7 @@ export default css.merge(
     backgroundColor: '#dc0067',
     color: 'white',
   }),
-  css.$(' label', {
+  $(' label', {
     display: 'block',
     color: '#444',
     float: 'left',
@@ -44,7 +44,7 @@ export default css.merge(
     fontSize: '0.9rem',
     paddingLeft: '.4rem',
   }),
-  css.$(' span', {
+  $(' span', {
     color: '#d22424',
     float: 'right',
     display: 'block',

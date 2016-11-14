@@ -1,24 +1,24 @@
-import css from 'next/css'
+import {style, merge, $} from 'glamor'
 
-export default css.merge(
-  css({
+export default merge(
+  style({
     width: '100%',
     margin: '0 auto',
     fontFamily: 'Helvetica, Arial, sans-serif',
     boxSizing: 'border-box',
     textAlign: 'center',
   }),
-  css.$(' h1', {
+  $(' h1', {
     marginTop: '0',
     color: '#444',
   }),
-  css.$(' input', {
+  $(' input', {
     boxSizing: 'border-box',
     display: 'block',
     width: '1rem',
     margin: '0 auto .5rem auto',
   }),
-  css.$(' input[type=text]', {
+  $(' input[type=text]', {
     display: 'block',
     height: '2rem',
     width: '100%',
@@ -30,11 +30,11 @@ export default css.merge(
     boxSizing: 'border-box',
     maxWidth: '60%',
   }),
-  css.$(' input:focus', {
+  $(' input:focus', {
     outline: 'none',
     borderColor: '#aaa',
   }),
-  css.$(' button', {
+  $(' button', {
     height: '2rem',
     width: '5rem',
     textTransform: 'uppercase',
@@ -43,7 +43,7 @@ export default css.merge(
     backgroundColor: '#dc0067',
     color: 'white',
   }),
-  css.$(' label', {
+  $(' label', {
     display: 'inline-block',
     color: '#444',
     marginBottom: '.5rem',
@@ -51,7 +51,7 @@ export default css.merge(
     fontSize: '0.9rem',
     paddingLeft: '.4rem',
   }),
-  css.$(' .error', {
+  $(' .error', {
     color: '#d22424',
     display: 'block',
     fontSize: '0.9rem',

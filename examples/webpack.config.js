@@ -19,11 +19,6 @@ module.exports = {
   ],
   module: {
     loaders: [
-      // {
-      //   next does
-      //   test: /\.css$/,
-      //   loader: 'style!css'
-      // },
       {
         test: /\.js$/,
         exclude: NODE_MODULES_DIR,
