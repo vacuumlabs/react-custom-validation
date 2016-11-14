@@ -22,7 +22,7 @@ app.get('/', example)
 app.get('/example/*', example)
 
 const compiler = webpack(webpackConfig)
-const webDev = webpackDev(compiler)
+const webDev = webpackDev(compiler, {noInfo: true})
 app.use(webDev)
 app.use(webpackHot(compiler))
 
