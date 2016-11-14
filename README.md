@@ -11,12 +11,13 @@ You can view the demo examples
 [here](https://sheltered-hollows-34568.herokuapp.com/).
 
 To run the examples locally:
-* Clone the repository: `git clone git@github.com:vacuumlabs/react-validation.git`
+* Clone the repository: `git clone git@github.com:vacuumlabs/react-custom-validation.git`
+* Enter the `examples` directory: `cd react-custom-validation/examples`
 * `npm install`
 * `npm run example`
 *  Navigate to `localhost:3000`
 
-Code of the examples is located in `pages/example/` directory.
+Code of the examples is located in `examples/example/` directory.
 
 Examples 1 and 2 illustrate the usage of this library in very simple cases. It is
 highly recommended to review and understand the code of these examples, as it can
