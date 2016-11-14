@@ -9,9 +9,9 @@ class Menu extends React.Component {
     return (
       <div>
         <div>
-          <Link to="/example/1"> Example1 </Link>
-          <Link to="/example/2"> Example2 </Link>
-          <Link to="/example/3"> Example3 </Link>
+          <Link to="/example1"> Example1 </Link>
+          <Link to="/example2"> Example2 </Link>
+          <Link to="/example3"> Example3 </Link>
         </div>
         <p/>
         {this.props.children}
@@ -25,9 +25,9 @@ export default class App extends React.Component {
     return (
       <Router history={browserHistory}>
         <Route component={Menu} path="/">
-          <Route component={Example1} path="example/1" />
-          <Route component={Example2} path="example/2" />
-          <Route component={Example3} path="example/3" />
+          <Route component={Example1} path="example1" />
+          <Route component={Example2} path="example2" />
+          <Route component={Example3} path="example3" />
         </Route>
       </Router>
     )

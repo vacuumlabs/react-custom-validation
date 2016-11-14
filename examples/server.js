@@ -19,7 +19,9 @@ function example(req, res) {
 }
 
 app.get('/', example)
-app.get('/example/*', example)
+app.get('/example1', example)
+app.get('/example2', example)
+app.get('/example3', example)
 
 const compiler = webpack(webpackConfig)
 const webDev = webpackDev(compiler, {noInfo: true})
