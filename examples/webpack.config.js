@@ -6,7 +6,7 @@ const NODE_MODULES_DIR = path.join(ABSOLUTE_BASE, 'node_modules')
 
 module.exports = {
   entry: [
-    './examples/index.js',
+    './index.js',
     'webpack-hot-middleware/client',
   ],
   devtool: 'cheap-source-map',
