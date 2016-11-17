@@ -1,7 +1,7 @@
 import React from 'react'
 import Promise from 'bluebird'
 import update from 'immutability-helper'
-import {validated} from '../../lib'
+import {validated} from 'react-custom-validation'
 import style from './style3'
 
 const add = (a, b) => a + b

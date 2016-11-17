@@ -1,17 +1,17 @@
-import css from 'next/css'
+import {style, merge, $} from 'glamor'
 
-export default css.merge(
-  css({
+export default merge(
+  style({
     width: '100%',
     margin: '0 auto',
     fontFamily: 'Helvetica, Arial, sans-serif',
     boxSizing: 'border-box',
   }),
-  css.$(' h1', {
+  $(' h1', {
     marginTop: '0',
     color: '#444',
   }),
-  css.$(' input[type=text]', {
+  $(' input[type=text]', {
     height: '2rem',
     padding: '0 .5rem',
     margin: '.5rem',
@@ -20,11 +20,11 @@ export default css.merge(
     boxSizing: 'border-box',
     textAlign: 'center',
   }),
-  css.$(' input:focus', {
+  $(' input:focus', {
     outline: 'none',
     borderColor: '#aaa',
   }),
-  css.$(' button', {
+  $(' button', {
     height: '2rem',
     textTransform: 'uppercase',
     borderRadius: '.25rem',
@@ -33,7 +33,7 @@ export default css.merge(
     color: 'white',
     cursor: 'pointer',
   }),
-  css.$(' label', {
+  $(' label', {
     display: 'inline-block',
     color: '#444',
     marginBottom: '.5rem',
@@ -41,15 +41,15 @@ export default css.merge(
     fontSize: '0.9rem',
     paddingLeft: '.4rem',
   }),
-  css.$(' .error', {
+  $(' .error', {
     fontSize: '0.9rem',
     margin: '1rem auto',
     marginLeft: '1rem',
   }),
-  css.$(' .buttons', {
+  $(' .buttons', {
     display: 'flex',
   }),
-  css.$(' .buttons button', {
+  $(' .buttons button', {
     marginLeft: '.5rem',
   })
 )

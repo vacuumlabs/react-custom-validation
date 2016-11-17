@@ -3,7 +3,7 @@ import Promise from 'bluebird'
 import update from 'immutability-helper'
 import validator from 'validator'
 import style from './style1'
-import {validated} from '../../lib'
+import {validated} from 'react-custom-validation'
 
 class App extends React.Component {
   state = {

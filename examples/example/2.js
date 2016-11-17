@@ -1,5 +1,5 @@
 import React from 'react'
-import {validated, isFormValid} from '../../lib'
+import {validated, isFormValid} from 'react-custom-validation'
 import style from './style2'
 
 class App extends React.Component {
