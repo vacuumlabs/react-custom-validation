@@ -3,6 +3,7 @@ import {Link, Router, Route, browserHistory} from 'react-router'
 import Example1 from './example/1'
 import Example2 from './example/2'
 import Example3 from './example/3'
+import Example4 from './example/4'
 
 const navStyle = {
   borderBottom: '1px solid #eee',
@@ -30,6 +31,7 @@ class Menu extends React.Component {
           <Link to="/example1" style={linkStyle}>Example 1</Link>
           <Link to="/example2" style={linkStyle}>Example 2</Link>
           <Link to="/example3" style={linkStyle}>Example 3</Link>
+          <Link to="/example4" style={linkStyle}>Example 4</Link>
         </div>
         <div>
           {this.props.children}
@@ -47,6 +49,7 @@ export default class App extends React.Component {
           <Route component={Example1} path="example1" />
           <Route component={Example2} path="example2" />
           <Route component={Example3} path="example3" />
+          <Route component={Example4} path="example4" />
         </Route>
       </Router>
     )
