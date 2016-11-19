@@ -7,7 +7,7 @@ course, really great user experience with your validated forms.
 
 ## Try it out
 
-You can view the demo examples [here](https://examples-ueleuarlxo.now.sh).
+You can view the demo examples [here](https://examples-mjhlzlsivz.now.sh).
 
 To run the examples locally:
 * Clone the repository: `git clone git@github.com:vacuumlabs/react-custom-validation.git`
